@@ -1,0 +1,76 @@
+---
+title: "Estimación del modelo de regresión lineal con R"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# La función *lm()*
+
+Para estimar modelos lineales en R se utiliza la función *lm()*, de *linear models*:
+
+```{r}
+d = faraway::gala
+m = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+```
+
+El resultado del análisis se ha guardado en la variable *m*. Con esta variable se puede obtener todos los resultados:
+
+- Matriz X:
+
+```{r}
+model.matrix(m)
+```
+
+
+- Parámetros estimados:
+
+```{r}
+coefficients(m)
+```
+
+- Valores estimados por el modelo:
+
+```{r}
+fitted(m)
+```
+
+- Residuos
+
+```{r}
+residuals(m)
+```
+
+- RSS
+
+```{r}
+deviance(m)
+```
+
+- Los valores anteriores también se pueden obtener con el símbolo $:
+
+```{r}
+m$coef
+```
+
+- Resultados estadísticos, que iremos viendo en los temas siguientes:
+
+```{r}
+summary(m)
+```
+
+- El resultado de summary también se puede guardar en una variable para tener, por ejemplo, el R2:
+
+```{r}
+m_summ = summary(m)
+m_summ$r.squared
+```
+

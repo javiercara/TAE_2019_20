@@ -1,0 +1,255 @@
+---
+title: "Modelo matemático y su estimación"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Modelo
+
+Tenemos 4 vectores de datos de longitud *n*: 
+
+\begin{equation}
+\begin{matrix}
+y & x_{1} & x_{2} & x_{3} \\
+\hline
+y_1 & x_{11} & x_{21} & x_{31} \\
+y_2 & x_{12} & x_{22} & x_{32} \\
+\cdots &\cdots & \cdots & \cdots \\
+y_n & x_{1n} & x_{2n} & x_{3n} \\
+\end{matrix}
+\end{equation}
+
+El modelo que vamos a utilizar para analizar estos datos es el modelo lineal:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \epsilon_i, \ i = 1,2,\cdots,n
+(\#eq:modelo2)
+\end{equation}
+
+- El término y se conoce como *variable respuesta*, y las x se conocen como *regresores*.
+- El término $\epsilon$ representa el error del modelo.
+- El término lineal se emplea porque la Ec. \@ref(eq:modelo2) es una función lineal de los parámetros $\beta_0$, $\beta_1$, $\beta_2$ y $\beta_3$. 
+- Modelos en apariencia complicados pueden ser considerados como un modelo lineal.
+- polinomios:
+
+\begin{equation}
+y = \beta_0 + \beta_1 x + \beta_2 x^2 + \epsilon \Rightarrow y = \beta_0 + \beta_1 x_1 + \beta_2 x_2
+\end{equation}
+
+- modelos con funciones en los regresores
+
+\begin{equation}
+y = \beta_0 + \beta_1 x + \beta_2 log x + \epsilon \Rightarrow y = \beta_0 + \beta_1 x_1 + \beta_2 x_2
+\end{equation}
+
+- modelos con interacción:
+
+\begin{equation}
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1 x_2 + \epsilon 
+\end{equation}
+
+- este modelo no es lineal
+
+\begin{equation}
+y = \beta_0 + \beta_1 x^{\beta_2} + \epsilon
+\end{equation}
+
+La Ec. \@ref(eq:modelo2) se suele escribir en notación matricial. Para ello escribimos la ecuación para todos los datos disponibles:
+
+\begin{equation}
+i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \beta_3 x_{31} + \epsilon_1
+\end{equation}
+
+\begin{equation}
+i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \beta_3 x_{32} + \epsilon_2
+\end{equation}
+
+\begin{equation}
+\cdots
+\end{equation}
+
+\begin{equation}
+i = n \Rightarrow y_n = \beta_0 + \beta_1 x_{1n} + \beta_2 x_{2n} + \beta_3 x_{3n} + \epsilon_n
+\end{equation}
+
+Agrupando:
+
+\begin{equation}
+\begin{bmatrix}
+y_1 \\ y_2 \\ \cdots \\ y_n
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 & x_{11} & x_{21} & x_{31} \\
+1 & x_{12} & x_{22} & x_{32} \\
+\cdots &\cdots & \cdots & \cdots \\
+1 & x_{1n} & x_{2n} & x_{3n} \\
+\end{bmatrix}
+\begin{bmatrix}
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3
+\end{bmatrix}
++
+\begin{bmatrix}
+\epsilon_1 \\ \epsilon_2 \\ \cdots \\ \epsilon_n
+\end{bmatrix}
+\end{equation}
+
+Finalmente, en notación matricial:
+
+\begin{equation}
+y = X \beta + \epsilon
+(\#eq:modelo_lineal_matrices)
+\end{equation}
+
+# Estimación del modelo
+
+## Definiciones 
+
+Se define el vector de parámetros estimados como:
+
+\begin{equation}
+\hat \beta
+=
+\begin{bmatrix}
+\hat \beta_0 \\ \hat \beta_1 \\ \hat \beta_2 \\ \hat \beta_3
+\end{bmatrix}
+\end{equation}
+
+La **respuesta estimada** por el modelo se calcula:
+
+\begin{equation}
+\hat y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}, \ i = 1,2,\cdots,n
+\end{equation}
+
+En forma matricial:
+
+\begin{equation}
+\hat y = X \hat \beta
+\end{equation}
+
+Se definen los **residuos** como la diferencia entre la variable respuesta real y la estimada:
+
+\begin{equation}
+e_i = y_i - \hat y_i = y_i - (\hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}), \ i = 1,2,\cdots,n
+\end{equation}
+
+En forma matricial:
+
+\begin{equation}
+e = y - \hat y = y - X \hat \beta
+\end{equation}
+
+## Estimación del modelo usando mínimos cuadrados
+
+El método de mínimos cuadrados consiste en calcular el valor de $\hat \beta$ que minimiza la suma de los residuos al cuadrado (RSS, *residula sum of squares*):
+
+\begin{equation}
+RSS = \sum e_i^2 = e^T e = (y - X \hat \beta)^T(y - X \hat \beta) = RSS(\hat \beta)
+\end{equation}
+
+Derivando con respecto a $\hat \beta$ e igualando a cero se obtiene el mínimo:
+
+\begin{equation}
+\hat \beta = (X^TX)^{-1}Xy
+\end{equation}
+
+La respuesta estimada se puede definir ahora como:
+
+\begin{equation}
+\hat y = X \hat \beta = X (X^TX)^{-1}XY = H y
+\end{equation}
+
+La matriz *H* se denomina en inglés *hat matrix*. Es muy útil para derivar resultados teóricos, pero en la práctica no se suele calcular explícitamente. Por ejemplo, los residuos se pueden expresar en función de la matriz H:
+
+\begin{equation}
+e =y - \hat y = (I-H)y
+\end{equation}
+
+## Bondad del modelo ajustado
+
+Es conveniente medir como de bueno es el ajuste del modelo y los datos. La manera mas usual es utilizar el coeficiente de determinación o $R^2$:
+
+\begin{equation}
+R^2 = 1 - \frac{RSS}{TSS}
+\end{equation}
+
+donde TSS es la suma total de cuadrados
+
+\begin{equation}
+TSS = \sum(y_i - \bar y)^2
+\end{equation}
+
+## Ejemplo
+
+Datos del número de especies encontradas en varias islas del Archipiélago de las Galápagos:
+
+```{r}
+d = faraway::gala
+str(d)
+```
+
+- Species: número de especies encontradas en la isla
+- Area: Area de la isla (km2)
+- Elevation: máxima elevación en la isla (m)
+- Nearest: distancia a la isla más cercana (km)
+- Scruz: distancia a la isla de Santa Cruz (km)
+- Adjacent: área de la isla adyacente (km2)
+- Endemics: número de especies endémicas
+
+Queremos hacer la regresión:
+
+\begin{equation}
+Species = \beta_0 + \beta_1 Area + \beta_2 Elevation + \beta_3 Nearest + \beta_4 Scruz + \beta_5 Adjacent + \epsilon
+\end{equation}
+
+- Matrices del modelo
+
+```{r}
+n = nrow(d)
+y = matrix(d$Species, ncol = 1)
+X = as.matrix(d[,c("Area","Elevation","Nearest","Scruz","Adjacent")])
+X = cbind(rep(1,n),X)
+```
+
+- Estimacion
+
+```{r}
+XT_X = t(X) %*% X
+( beta_e = solve(XT_X) %*% (t(X) %*% y) )
+```
+
+- respuesta estimada
+
+```{r}
+y_e = X %*% beta_e
+```
+
+- residuos
+
+```{r}
+e = y - y_e
+```
+
+- juntando los resultados:
+
+```{r}
+data.frame(y,y_e,e)
+```
+
+- R2
+
+```{r}
+(RSS = sum(e^2))
+(TSS = sum((y-mean(y))^2))
+(R2 = 1 - RSS/TSS)
+```
+
