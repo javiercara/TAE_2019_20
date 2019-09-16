@@ -5,7 +5,7 @@ output:
     number_sections: true
     toc: true
     toc_float: true
-    theme: flatly
+    theme: readable
     highlight: tango
 ---
 
@@ -32,13 +32,12 @@ El modelo que vamos a utilizar para analizar estos datos es el modelo lineal:
 
 \begin{equation}
 y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \epsilon_i, \ i = 1,2,\cdots,n
-(\#eq:modelo2)
 \end{equation}
 
-- El término y se conoce como *variable respuesta*, y las x se conocen como *regresores*.
+- El término *y* se conoce como *variable respuesta*, y las *x* se conocen como *regresores*.
 - El término $\epsilon$ representa el error del modelo.
-- El término lineal se emplea porque la Ec. \@ref(eq:modelo2) es una función lineal de los parámetros $\beta_0$, $\beta_1$, $\beta_2$ y $\beta_3$. 
-- Modelos en apariencia complicados pueden ser considerados como un modelo lineal.
+- El término *lineal* se emplea porque la ecuación del modelo es una función lineal de los parámetros $\beta_0$, $\beta_1$, $\beta_2$ y $\beta_3$. 
+- Modelos en apariencia complicados pueden ser considerados como un modelo lineal. Por ejemplo:
 - polinomios:
 
 \begin{equation}
@@ -63,7 +62,7 @@ y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_1 x_2 + \epsilon
 y = \beta_0 + \beta_1 x^{\beta_2} + \epsilon
 \end{equation}
 
-La Ec. \@ref(eq:modelo2) se suele escribir en notación matricial. Para ello escribimos la ecuación para todos los datos disponibles:
+La ecuación del modelo se suele escribir en notación matricial. Para ello escribimos la ecuación para todos los datos disponibles:
 
 \begin{equation}
 i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \beta_3 x_{31} + \epsilon_1
@@ -107,7 +106,6 @@ Finalmente, en notación matricial:
 
 \begin{equation}
 y = X \beta + \epsilon
-(\#eq:modelo_lineal_matrices)
 \end{equation}
 
 # Estimación del modelo
@@ -176,7 +174,7 @@ e =y - \hat y = (I-H)y
 
 ## Bondad del modelo ajustado
 
-Es conveniente medir como de bueno es el ajuste del modelo y los datos. La manera mas usual es utilizar el coeficiente de determinación o $R^2$:
+Es conveniente medir como de bueno es el ajuste del modelo. La manera mas usual es utilizar el coeficiente de determinación o $R^2$:
 
 \begin{equation}
 R^2 = 1 - \frac{RSS}{TSS}
@@ -196,6 +194,8 @@ Datos del número de especies encontradas en varias islas del Archipiélago de l
 d = faraway::gala
 str(d)
 ```
+
+El significado de las variables es:
 
 - Species: número de especies encontradas en la isla
 - Area: Area de la isla (km2)

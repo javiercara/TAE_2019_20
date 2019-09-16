@@ -1,0 +1,388 @@
+---
+title: "Regresión Lineal con variables cualitativas"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: flatly
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Datos
+
+```{r}
+library(ISLR)
+datos=Credit
+str(datos)
+```
+
+
+# Variables cualitativas con dos niveles
+
+## Variables auxiliares
+
+Creamos una **variable auxiliar**, *mujer*, con los valores
+
+- Mujer = 1, si Gender = Female
+- Mujer = 0, si Gender = Male
+
+```{r}
+Mujer = as.numeric(datos$Gender == "Female")
+```
+
+El modelo estadístico que queremos estiamar es:
+
+$$
+Balance = \beta_0 + \beta_1 Mujer + u
+$$
+
+```{r}
+m1 = lm(Balance ~ Mujer, data = datos)
+summary(m1)
+```
+
+El el fondo tenemos dos modelos, uno para los hombres y otro para las mujeres:
+
+- Hombres (variable Mujer = 0): $Balance = \beta_0$ El crédito medio de los hombres es 509.80
+
+- Mujeres (variable Mujer = 1): $Balance = \beta_0 + \beta_1$ El crédito medio de las mujeres es 509.80 + 19.73 = 529.53
+
+## Factores
+
+Una manera más elegante de estimar estos modelos en R es utilizar una variable factor para representar la variable cualitativa:
+
+```{r}
+class(datos$Gender)
+```
+
+```{r}
+levels(datos$Gender)
+```
+
+Como *Gender* es de tipo factor, se puede hacer:
+
+```{r}
+m2 = lm(Balance ~ Gender, data = datos)
+summary(m2)
+```
+
+Internamente, R asigna los valores:
+
+```{r}
+contrasts(datos$Gender)
+```
+
+## Cambio de variable auxiliar
+
+También se podía haber elegido como variable auxiliar la variable *Hombre*, con los valores
+
+- Hombre = 0 si Gender = Female
+- Hombre = 1, si Gender = Male
+
+```{r}
+Hombre = as.numeric(datos$Gender == " Male") # cuidado con el espacio
+```
+
+El modelo sería ahora:
+
+$$
+Balance = \beta_0 + \beta_1 Hombre + u
+$$
+
+```{r}
+m3 = lm(Balance ~ Hombre, data = datos)
+summary(m3)
+```
+
+Es decir:
+
+- Hombres (variable Hombre = 1): $Balance = \beta_0 + \beta_1$ El crédito medio de los hombres es 529.54 - 19.73 = 509.81
+
+- Mujeres (variable Mujer = 1): $Balance = \beta_0$ El crédito medio de las mujeres es 529.54
+
+Si estamos utilizando factores, tenemos que cambiar el orden de los niveles del factor:
+
+```{r}
+Gender1 = relevel(datos$Gender, ref = "Female")
+levels(Gender1)
+```
+
+```{r}
+m4 = lm(datos$Balance ~ Gender1)
+summary(m4)
+```
+
+## Modelo sin ordenada en el origen
+
+También se puede utilizar el modelo equivalente:
+
+$$
+Balance = \beta_1 Hombre + \beta_2 Mujer + u
+$$
+
+en el que se utilizan las dos variables auxiliares pero se elimina el parámetro $\beta_0$.
+
+```{r}
+m5 = lm(Balance ~ 0 + Hombre + Mujer, data = datos)
+summary(m5)
+```
+
+Con factores:
+
+```{r}
+m6 = lm(datos$Balance ~ 0 + Gender, data = datos)
+summary(m6)
+```
+
+# Variable cualitativa con tres niveles
+
+## Variables auxiliares
+
+En el caso de tener variables cualitativas con más de dos niveles:
+
+```{r}
+class(datos$Ethnicity)
+```
+
+```{r}
+levels(datos$Ethnicity)
+```
+
+Definimos las variables axiliares:
+
+- Afro = 1 si Ethnicity = African American
+- Asia = 1 si Ethnicity = Asian
+- Cauc = 1 si Ethnicity = Caucasian
+
+```{r}
+Afro = as.numeric(datos$Ethnicity == "African American")
+Asia = as.numeric(datos$Ethnicity == "Asian")
+Cauc = as.numeric(datos$Ethnicity == "Caucasian")
+```
+
+Como la variable tiene tres niveles, necesitamos incluir dos variables auxiliares en el modelo estadístico:
+
+Modelo general:
+
+$$
+Balance = \beta_0 + \beta_1 Asia + \beta_2 Cauc + u
+$$
+
+Modelo para "African American": Asia = 0, Cauc = 0
+
+$$
+Balance = \beta_0 + u
+$$
+
+Modelo para "Asian": Asia = 1, Cauc = 0
+
+$$
+Balance = \beta_0 + \beta_1 + u
+$$
+
+Modelo para "Caucasian": Asia = 0, Cauc = 1
+
+$$
+Balance = \beta_0 + \beta_2 + u
+$$
+En R:
+
+```{r}
+m7 = lm(Balance ~ Asia + Cauc, data = datos)
+summary(m7)
+```
+
+Utilizando factores se obtienen los mismos resultados:
+
+```{r}
+m8 = lm(Balance ~ Ethnicity, data = datos)
+summary(m8)
+```
+
+Comprovamos que internamente R crea variables auxiliares según los valores:
+
+```{r}
+contrasts(datos$Ethnicity)
+```
+
+Podemos hacer otras comparaciones cambiando la variable de referencia:
+
+```{r}
+Ethnicity1 = relevel(datos$Ethnicity, ref="Asian")
+levels(Ethnicity1)
+```
+
+```{r}
+m9 = lm(Balance ~ Ethnicity1, data = datos)
+summary(m9)
+```
+
+Que en el fondo estamos haciendo:
+
+```{r}
+m10 = lm(Balance ~ Afro + Cauc, data = datos)
+summary(m9)
+```
+
+
+También podemos reordenar los niveles de la variable factor:
+
+```{r}
+Ethnicity2 = factor(datos$Ethnicity,levels=c("Caucasian","Asian","African American"))
+levels(Ethnicity2)
+```
+
+```{r}
+m11 = lm(Balance ~ Ethnicity2, data = datos)
+summary(m11)
+```
+
+# Variables cualitativas y cuantitativas
+
+## Modelo sin interacción
+
+Es muy frecuente contar con regresores cualitativos y cuantitativos. Por ejemplo, vamos a estudiar la variable *Balance* en función de *Income* (cuantitativa) y *Student* (cualitativa). Definimos la variable auxiliar *Estudiante*
+
+- Estudiante = 0: (Student = No)
+
+- Estudiante = 1: (Student = Yes)
+
+El modelo que vamos a analizar es:
+
+$$
+Balance = \beta_0 + \beta_1 Income + \beta_2 Estudiante + u
+$$
+
+Por tanto:
+
+- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income$
+
+- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + \beta_1 Income$
+
+Tenemos dos rectas, **con la misma pendiente** y distinta $\beta_0$. En R:
+
+```{r}
+m12 = lm(Balance ~ Income + Student, data = datos)
+summary(m12)
+```
+
+```{r}
+plot(datos$Income, datos$Balance, col = datos$Student)
+abline(m12$coefficients["(Intercept)"], m12$coefficients["Income"])
+abline(m12$coefficients["(Intercept)"] + m12$coefficients["StudentYes"],
+       m12$coefficients["Income"], col="red")
+```
+
+## Modelo con interacción
+
+¿Podemos representar con un único modelo dos rectas con distinta pendiente, una para estudiantes y otra para no estudiantes? Sea el modelo:
+
+$$
+Balance = \beta_0 + \beta_1 Income + \beta_2 Estudiante + \beta_3 Estudiante Income + u
+$$
+
+- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income$
+
+- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + (\beta_1 + \beta_3) Income$
+
+Tenemos dos rectas, con la misma pendiente y distinta $\beta_0$.
+
+```{r}
+m13 = lm(Balance ~ Income*Student, data = datos)
+summary(m13)
+```
+
+Según los resultados del análisis, las rectas tienen la misma pendiente.
+
+La interacción en R también se define utilizando los dos puntos (:). Por tanto, el modelo anterior es equivalente a poner:
+
+```{r}
+m14 = lm(Balance ~ Income + Student + Income:Student, data = datos)
+summary(m14)
+```
+
+```{r}
+plot(datos$Income, datos$Balance, col = datos$Student)
+abline(m14$coefficients["(Intercept)"], m14$coefficients["Income"])
+abline(m14$coefficients["(Intercept)"] + m14$coefficients["StudentYes"],
+       m14$coefficients["Income"], col="red")
+```
+
+# Más de una variable cualitativa
+
+Sea el modelo que analiza la variable *Balance* en función de *Income*, *Gender* y *Ethnicity*. Recordamos que tenemos las variables auxiliares:
+
+- Mujer = 1, si Gender = Female
+- Mujer = 0, si Gender = Male
+
+- Afro = 1, si Ethnicity = African American
+- Asia = 1, si Ethnicity = Asian
+- Cauc = 1, si Ethnicity = Caucasian
+
+El primer modelo que podemos construir es:
+
+$$
+Balance = \beta_0 + \beta_1 Income + \beta_2 Mujer + \beta_3 Asia + \beta_4 Cauc + u
+$$
+
+| Gender | Ethnicity | Modelo |
+| ------ | --------- | ------ |
+| Hombre | Afro      | $Balance = \beta_0 + \beta_1 Income + u$ |
+| Hombre | Asia      | $Balance = (\beta_0 + \beta_3) + \beta_1 Income + u$ |
+| Hombre | Cauc      | $Balance = (\beta_0 + \beta_4) + \beta_1 Income + u$ |
+| Mujer  | Afro      | $Balance = (\beta_0 + \beta_2) + \beta_1 Income + u$ |
+| Mujer  | Asia      | $Balance = (\beta_0 + \beta_2 + \beta_3) + \beta_1 Income + u$ |
+| Mujer  | Cauc      | $Balance = (\beta_0 + \beta_2 + \beta_4) + \beta_1 Income + u$ |
+
+Como vemos, la pendiente $\beta_1$ que relaciona *Balance* e *Income* no depende del género ni de la raza. Sin embargo, la ordenada en el origen si depende de ambos factores de manera aditiva.
+
+```{r}
+m15 = lm(Balance ~ Income + Gender + Ethnicity, data = datos)
+summary(m15)
+```
+
+Podemos considerar interacciones entre el regresor cuantitativo y los cualitativos:
+
+$$
+Balance = \beta_0 + \beta_1 Income + \beta_2 Mujer + \beta_3 Asia + \beta_4 Cauc + \beta_5 Mujer * Income + \beta_6 Asia * Income + \beta_7 Cauc * Income + u
+$$
+
+| Gender | Ethnicity | Modelo |
+| ------ | --------- | ------ |
+| Hombre | Afro      | $Balance = \beta_0 + \beta_1 Income + u$ |
+| Hombre | Asia      | $Balance = (\beta_0 + \beta_3) + (\beta_1 + \beta_6) Income + u$ |
+| Hombre | Cauc      | $Balance = (\beta_0 + \beta_4) + (\beta_1 + \beta_7) Income + u$ |
+| Mujer  | Afro      | $Balance = (\beta_0 + \beta_2) + (\beta_1 + \beta_5) Income + u$ |
+| Mujer  | Asia      | $Balance = (\beta_0 + \beta_2 + \beta_3) + (\beta_1 + \beta_5 + \beta_6) Income + u$ |
+| Mujer  | Cauc      | $Balance = (\beta_0 + \beta_2 + \beta_4) + (\beta_1 + \beta_5 + \beta_7) Income + u$ |
+
+Es decir, tanto la pendiente como las ordenada en el origen dependen de los niveles de los factores. En R:
+
+```{r}
+m16 = lm(Balance ~ Income + Gender + Ethnicity + Income:Gender + Income:Ethnicity, data = datos)
+summary(m16)
+```
+
+De igual forma se podrían añadir las interacciones *Gender:Ethnicity* y *Gender:Ethnicity:Income*, lo que añadiría nuevos términos al modelo.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

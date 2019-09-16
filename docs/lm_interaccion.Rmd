@@ -1,0 +1,131 @@
+---
+title: "Regresión lineal con términos de interacción"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Interacción de primer orden
+
+En regresión, tenemos interacción cuando el producto de dos o más regresores también es incluido como regresor (además de los regresores considerados individualmente). Supongamos que tenemos dos regresores $x_1$ y $x_2$ y queremos incluir su interacción en la regresión. El modelo sería:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{1i}x_{2i} + \epsilon_i
+\end{equation}
+
+El término $\beta_3 x_{1i}x_{2i}$ es conocido como *término de interacción*. La fórmula en R para este modelo es:
+
+```{r eval = F}
+y ~ x1 * x2
+```
+
+Cuando escribimos $y \sim x1*x2$, R automáticamente incluye $x_1$ y $x_2$ y su producto. Esto es así porque la teoría nos dice que si incluimos un término de interacción en el modelo también deberíamos incluir los regresores individuales.
+
+Otra manera de incluir los términos de interacción sería:
+
+```{r eval = F}
+y ~ x1 + x2 + x1:x2
+```
+
+# Interacción de segundo orden
+
+Si tenemos tres regresores y queremos incluir todas las interacciones posibles (es decir, productos de regresores), el modelo sería:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \beta_4 x_{1i}x_{2i} + \beta_5 x_{1i}x_{3i} + \beta_6 x_{2i}x_{3i} + \beta_7 x_{1i}x_{2i}x_{3i} + \epsilon_i
+\end{equation}
+
+Tenemos tres interacciones de primer orden como $\beta_5 x_{1i} x_{3i}$ y una interacción de segundo orden, $\beta_7 x_{1i} x_{2i} x_{3i}$. En R sería:
+
+```{r eval = F}
+y ~ x1 * x2 * x3
+```
+
+Podemos especificar solo unos términos de interacción determinados mediante el operador (:). Por ejemplo, el modelo
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \beta_4 x_{1i}x_{2i}x_{3i} + \epsilon_i
+\end{equation}
+
+en R se escribe:
+
+```{r eval = F}
+y ~ x1 + x2 + x3 + x1:x2:x3
+```
+
+# Otras formas de incluir interacciones
+
+```{r eval = F}
+(x1 + x2 + ... + xk)^2
+```
+
+Esta fórmula incluye los regresores individuales y todas las interacciones de primer orden.
+
+```{r eval = F}
+(x1 + x2 + ... + xk)^3
+```
+
+Esta fórmula incluye los regresores individuales, todas las interacciones de primer orden, y todas las interacciones de segundo orden. Y así para otros valores del exponente.
+
+El asterisco (*) y los dos puntos (:) siguen una *ley distributiva*:
+
+```{r eval = F}
+u*(x1 + x2 + ... + xk)
+```
+
+es equivalente a 
+
+```{r eval = F}
+u*x1 + u*x2 + ... + u*xk
+```
+
+que es lo mismo que
+
+```{r eval = F}
+u + x1 + x2 + ... + xk + u:x1 + u:x2 + ... + u:xk
+```
+
+El modelo
+
+```{r eval = F}
+u:(x1 + x2 + ... + xk)
+```
+
+es equivalente a 
+
+```{r eval = F}
+u:x1 + u:x2 + ... + u:xk
+```
+
+Por ejemplo, estos tres modelos son equivalentes
+
+```{r eval = F}
+y ~ x1 * x2
+y ~ x1 + x2 + x1:x2
+y ~ (x1 + x2)^2
+```
+
+# Ejemplo
+
+Vamos a incluir la interacción de primer orden entre *Area* y *Elevation*:
+
+```{r}
+d = faraway::gala
+m = lm(Species ~ 0 + Area * Elevation + Nearest + Scruz + Adjacent, data = d)
+summary(m)
+```
+
+Observamos que el $R^2$ es ha subido con respecto al modelo sin términos de interacción.
+
+
+
+
+

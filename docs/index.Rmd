@@ -7,11 +7,17 @@ output: html_document
 
 <br>
 
-# Contenido
+# __Contenido__
+***
 
-1. Regresión Lineal
-    1. [Modelo matemático y su estimación](01_estimacion.html)
-    2. [Estimación del modelo de regresión lineal con R](02_estimacionR.html)
-2. Árboles de decisión
+## PARTE I: REGRESION LINEAL
+
+1. [Modelo matemático y su estimación](lm_estimacion.html)
+2. [Estimación del modelo de regresión lineal con R](lm_estimacionR.html)
+3. [Regresión lineal con términos de interacción](lm_interaccion.html)
+4. [Fórmulas y expresiones en el modelo de regresión](lm_formulas.html)
+5. [Regresión lineal con variables cualitativas](lm_cualitativas.html)
+
+
     
 <br>

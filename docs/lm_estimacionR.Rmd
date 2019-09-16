@@ -5,7 +5,7 @@ output:
     number_sections: true
     toc: true
     toc_float: true
-    theme: flatly
+    theme: readable
     highlight: tango
 ---
 
@@ -74,3 +74,43 @@ m_summ = summary(m)
 m_summ$r.squared
 ```
 
+# Regresión lineal sin ordenada en el origen
+
+El modelo que queremos estimar es
+
+\begin{equation}
+y_i = \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \epsilon_i, \ i = 1,2,\cdots,n
+\end{equation}
+
+es decir, tenemos que $\beta_0 = 0$. En forma matricial tendríamos $y = X\beta + \epsilon$, donde:
+
+\begin{equation}
+X = 
+\begin{bmatrix}
+x_{11} & x_{21} & x_{31} \\
+x_{12} & x_{22} & x_{32} \\
+\cdots &\cdots & \cdots & \cdots \\
+x_{1n} & x_{2n} & x_{3n} \\
+\end{bmatrix}
+, \
+\beta = 
+\begin{bmatrix}
+\beta_1 \\ \beta_2 \\ \beta_3
+\end{bmatrix}
+\end{equation}
+
+En R, este modelo se estima añadiendo un cero en la declaración de los regresores:
+
+```{r}
+m2 = lm(Species ~ 0 + Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+summary(m2)
+```
+
+El $R^2$ de este modelo es superior al modelo m1.
+
+Otra opción es:
+
+```{r}
+m3 = lm(Species ~ -1 + Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+summary(m3)
+```

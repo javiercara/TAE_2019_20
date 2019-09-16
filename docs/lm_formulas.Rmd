@@ -1,0 +1,82 @@
+---
+title: "Fórmulas y expresiones en el modelo de regresión"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Expresiones
+
+- Queremos realizar la siguiente regresión:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 (x_{1i} + x_{2i}) + \epsilon_i
+\end{equation}
+
+En R se expresa mediante el operador I():
+
+```{r eval = F}
+y ~ I(x1 + x2)
+```
+
+ya que la expresión:
+
+```{r eval = F}
+y ~ x1 + x2
+```
+
+corresponde al modelo:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \epsilon_i
+\end{equation}
+
+- Otro ejemplo es el modelo:
+
+\begin{equation}
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{1i}^2 + \epsilon_i
+\end{equation}
+
+En R este modelo se expresa utilizando:
+
+```{r eval = F}
+y ~ x1 + I(x2^2)
+```
+
+ya que la expresión
+
+```{r eval = F}
+y ~ x1 + x2^2
+```
+
+significa interacción y no el cuadrado del regresor.
+
+# Fórmulas
+
+Es frecuente incluir fórmulas matemáticas en el modelo de regresión. Por ejemplo:
+
+\begin{equation}
+\log(y_i) = \beta_0 + \beta_1 x_{1i} + \beta_2 e^{x_{2i}} + \epsilon_i
+\end{equation}
+
+En R, este modelo se indica:
+
+```{r eval = F}
+log(y) ~ x1 + exp(x2)
+```
+
+# Ejemplo
+
+```{r}
+d = faraway::gala
+m = lm(Species ~ 0 + Area * Elevation + I(Area^2) + Nearest + Scruz + Adjacent, data = d)
+summary(m)
+```
