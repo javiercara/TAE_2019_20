@@ -108,6 +108,8 @@ Finalmente, en notación matricial:
 y = X \beta + \epsilon
 \end{equation}
 
+Esta ecuación es válida para cualquier número de regresore y cualquier númro de observaciones.
+
 # Estimación del modelo
 
 ## Definiciones 
@@ -157,13 +159,13 @@ RSS = \sum e_i^2 = e^T e = (y - X \hat \beta)^T(y - X \hat \beta) = RSS(\hat \be
 Derivando con respecto a $\hat \beta$ e igualando a cero se obtiene el mínimo:
 
 \begin{equation}
-\hat \beta = (X^TX)^{-1}Xy
+\hat \beta = (X^TX)^{-1}X^Ty
 \end{equation}
 
 La respuesta estimada se puede definir ahora como:
 
 \begin{equation}
-\hat y = X \hat \beta = X (X^TX)^{-1}XY = H y
+\hat y = X \hat \beta = X (X^TX)^{-1}X^T Y = H y
 \end{equation}
 
 La matriz *H* se denomina en inglés *hat matrix*. Es muy útil para derivar resultados teóricos, pero en la práctica no se suele calcular explícitamente. Por ejemplo, los residuos se pueden expresar en función de la matriz H:

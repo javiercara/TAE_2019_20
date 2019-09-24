@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Javier Cara" />
@@ -343,18 +344,6 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -393,6 +382,12 @@ $(document).ready(function () {
 <li><a href="lm_interaccion.html">Regresión lineal con términos de interacción</a></li>
 <li><a href="lm_formulas.html">Fórmulas y expresiones en el modelo de regresión</a></li>
 <li><a href="lm_cualitativas.html">Regresión lineal con variables cualitativas</a></li>
+<li>Inferencia en el modelo de regresión lineal
+<ol style="list-style-type: lower-alpha">
+<li><a href="lm_inferencia_muestreo.html">Distribuciones en el muestreo</a></li>
+<li><a href="lm_inferencia_intervalos.html">Intervalos de confianza</a></li>
+<li><a href="lm_inferencia_contrastes.html">Contrastes de hipótesis</a></li>
+</ol></li>
 </ol>
 <p><br></p>
 </div>
@@ -415,6 +410,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

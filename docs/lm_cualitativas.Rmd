@@ -5,7 +5,7 @@ output:
     number_sections: true
     toc: true
     toc_float: true
-    theme: flatly
+    theme: readable
     highlight: tango
 ---
 
@@ -260,9 +260,9 @@ $$
 
 Por tanto:
 
-- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income$
+- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income + u$
 
-- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + \beta_1 Income$
+- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + \beta_1 Income + u$
 
 Tenemos dos rectas, **con la misma pendiente** y distinta $\beta_0$. En R:
 
@@ -283,21 +283,19 @@ abline(m12$coefficients["(Intercept)"] + m12$coefficients["StudentYes"],
 ¿Podemos representar con un único modelo dos rectas con distinta pendiente, una para estudiantes y otra para no estudiantes? Sea el modelo:
 
 $$
-Balance = \beta_0 + \beta_1 Income + \beta_2 Estudiante + \beta_3 Estudiante Income + u
+Balance = \beta_0 + \beta_1 Income + \beta_2 Estudiante + \beta_3 Estudiante * Income + u
 $$
 
-- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income$
+- Si Estudiante = 0: $Balance = \beta_0 + \beta_1 Income + u$
 
-- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + (\beta_1 + \beta_3) Income$
+- Si Estudiante = 1: $Balance = (\beta_0  + \beta_2) + (\beta_1 + \beta_3) Income + u$
 
-Tenemos dos rectas, con la misma pendiente y distinta $\beta_0$.
+Tenemos dos rectas, con diferente pendiente y ordenada en el origen.
 
 ```{r}
 m13 = lm(Balance ~ Income*Student, data = datos)
 summary(m13)
 ```
-
-Según los resultados del análisis, las rectas tienen la misma pendiente.
 
 La interacción en R también se define utilizando los dos puntos (:). Por tanto, el modelo anterior es equivalente a poner:
 
@@ -310,7 +308,7 @@ summary(m14)
 plot(datos$Income, datos$Balance, col = datos$Student)
 abline(m14$coefficients["(Intercept)"], m14$coefficients["Income"])
 abline(m14$coefficients["(Intercept)"] + m14$coefficients["StudentYes"],
-       m14$coefficients["Income"], col="red")
+       m14$coefficients["Income"] + m14$coefficients["Income:StudentYes"], col="red")
 ```
 
 # Más de una variable cualitativa

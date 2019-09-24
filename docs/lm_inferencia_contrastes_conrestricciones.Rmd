@@ -1,0 +1,451 @@
+---
+title: "Inferencia en el modelo de regresión lineal: contrastes de hipótesis"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Contrastes para las $\beta_i$ usando la distribución *t-student*
+
+## Teoría
+
+Queremos resolver los contrastes:
+
+$$
+H_0: \beta_i = 0 \\
+H_1: \beta_i \neq 0
+$$
+
+para el modelo $y_i = \beta_0 + \beta_1 x_{1i} + \cdots + \beta_k x_{ki} + u_i$. Hemos visto que
+
+$$
+\frac{\hat \beta_i - \beta_i}{se(\hat \beta_i)} \rightarrow t_{n-k-1}
+$$
+
+Por tanto, si $H_0$ es cierta:
+
+$$
+t_0 = \frac{\hat \beta_i}{se(\hat \beta_i)} \rightarrow t_{n-k-1}
+$$
+
+Sea $t_{n-k-1;\alpha/2}$ el valor de una t-student con (n-k-1) grados de libertad tal que
+
+$$
+P(t_{n-k-1} \geq t_{n-k-1;\alpha/2}) = \alpha/2
+$$
+
+- si $t_0 \geq t_{n-k-1;\alpha/2}$: se rechaza $H_0$
+- si $t_0 \leq t_{n-k-1;\alpha/2}$: no se rechaza $H_0$
+
+Se define el *pvalor* como:
+
+$$
+pvalor = 2 P(t_{n-k-1} \geq |t_0|)
+$$
+
+Por tanto
+
+- si $pvalor \leq \alpha$: se rechaza $H_0$
+- si $t_0 \geq \alpha$: no se rechaza $H_0$
+
+## Ejemplo 1
+
+- Datos:
+
+```{r}
+d = cars
+d$dist_m = d$dist*0.3048
+d$speed_kmh = d$speed*1.60934
+str(d)
+```
+
+- Estimación del modelo:
+
+```{r}
+m1 = lm(dist_m ~ speed_kmh, data = d)
+(beta_e = coefficients(m1))
+(beta_var = vcov(m1))
+(beta_se = sqrt(diag(beta_var)))
+```
+
+- El contraste que vamos a resolver es:
+
+$$
+H_0: \beta_0 = 0 \\
+H_1: \beta_0 \neq 0
+$$
+
+- Cálculo del $t_0$:
+
+```{r}
+(t0 = beta_e[1]/beta_se[1])
+```
+
+- Solución del contraste:
+
+```{r}
+(t_lim = qt(0.05/2, df = 48))
+```
+
+como t_lim < t0, se rechaza Ho.
+
+- pvalor
+
+```{r}
+(pvalor = 2*pt(t0, 48))
+```
+
+- Solución del contraste con R:
+
+```{r}
+summary(m1)
+```
+
+## Ejemplo 2
+
+```{r}
+d2 = faraway::gala
+m2 = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d2)
+summary(m2)
+```
+
+Veamos de donde salen los valores de la tabla anterior. Por ejemplo, para $\beta_{Scruz}$:
+
+- Estimate:
+
+```{r}
+(beta_e = coefficients(m2))
+```
+
+- Std. Error:
+
+```{r}
+(beta_se = sqrt(diag(vcov(m2))))
+```
+
+- t value:
+
+```{r}
+(t_value = beta_e/beta_se)
+```
+
+- Pr(>|t|) (es decir, p-valores):
+
+```{r}
+(pvalores = 2*pt(abs(t_value), df = 24, lower.tail = F))
+```
+
+- Si juntamos todo en una tabla:
+
+```{r}
+data.frame(beta_e, beta_se, t_value, pvalores)
+```
+
+# Contraste para $\sigma^2$
+
+El contraste es:
+
+$$
+H_0 : \sigma^2 = \sigma^2_0 \\
+H_1 : \sigma^2 \neq \sigma^2_0
+$$
+
+El estadístico del contraste que vamos a utilizar es:
+
+$$
+\frac{(n-k-1)\hat s_R^2}{\sigma^2} \rightarrow \chi^2_{n-k-1}
+$$
+
+Por tanto, si la hipótesis nula es cierta,
+
+$$
+\chi^2_0 = \frac{(n-k-1)\hat s_R^2}{\sigma^2_0} \rightarrow \chi^2_{n-k-1}
+$$
+
+Como ejemplo, en el modelo m1 vamos a contrastar
+
+$$
+H_0 : \sigma^2 = 25 \\
+H_1 : \sigma^2 \neq 25
+$$
+
+```{r}
+(chisq_0 = sum(resid(m1)^2)/25)
+# contraste bilateral
+c(qchisq(0.05/2,df = 48), qchisq(1-0.05/2,df = 48))
+```
+
+Por tanto no se rechaza la hipótesis nula.
+
+# Contraste de regresión múltiple
+
+## La distribución *F*
+
+Sean una $\chi^2_m$ y una $\chi^2_n$, ambas independientes. La distribución F se define como
+
+$$
+\frac{\chi^2_m / m}{\chi^2_n / n} \sim F_{m,n}
+$$
+
+## Descomposición de la variabilidad
+
+Tenemos el modelo
+
+$$
+y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \cdots + \hat \beta_k x_{ki} + e_i = \hat y_i + e_i
+$$
+
+Restando la media $\bar y = \sum y_i / n$:
+
+$$
+y_i - \bar y = \hat y_i - \bar y + e_i 
+$$
+
+Elevando al cuadrado y sumando se tiene:
+
+$$
+\sum (y_i - \bar y)^2 = \sum (\hat y_i - \bar y)^2 + \sum e_i^2 
+$$
+ya que $\sum (\hat y_i - \bar y) e_i = 0$. Se denominan:
+
+- Variabilitad total: $\boxed{VT = \sum (y_i - \bar y)^2} = (n-1)\hat s_y^2$
+- Variabilidad explicada: $\boxed{VE = \sum (\hat y_i - \bar y)^2}$
+- Variabilidad no explicada o residual: $\boxed{VNE = \sum e_i^2} = (n-k-1)\hat s_R^2$
+
+## Contraste
+
+Es el contraste más importante en regresión múltiple, ya que establece si alguno de los regresores influye en la respuesta. Es decir, en el modelo $y_i = \beta_0 + \beta_1 x_{1i} + \cdots + \beta_k x_{ki} + u_i$ se constrasta si
+
+$$
+H_0 : \beta_1 = \beta_2 = \cdots = \beta_k = 0 \\
+H_1 : \text{Algún } \beta_i \neq 0
+$$
+
+Para resolver este contraste, se puede demostrar que:
+
+- Si $\beta_1 = \beta_2 = \cdots = \beta_k = 0 \Rightarrow \boxed{VE/\sigma^2 \sim \chi^2_k}$
+- $\boxed{VNE/\sigma^2 \sim \chi^2_{n-k-1}}$
+- VE y VNE son independientes.
+
+Por lo tanto es razonable utilizar el estadístico:
+
+$$
+\frac{\frac{VE/\sigma^2}{k}}{\frac{VNE/\sigma^2}{n-k-1}} \sim F_{k, n-k-1} \Rightarrow F_0 = \frac{VE/k}{VNE/(n-k-1)} \sim F_{k, n-k-1}
+$$
+
+Se rechazará la hipótesis nula para valores grandes del estadístico:
+
+- si $F_0 > F_\alpha$: se rechaza $H_0$
+- si $F_0 \leq F_\alpha$: no se rechaza $H_0$
+
+## Ejemplo
+
+Queremos contrastar si $\beta_{Area} = \beta_{Elevation} = \beta_{Nearest}  = \beta_{Scruz} = \beta_{Adjacent}= 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*, es decir, si hay relación lineal entre el número de especies y estos regresores.
+
+```{r}
+(VT = sum((d2$Species - mean(d2$Species))^2) )
+(VNE = sum(resid(m2)^2))
+(VE = VT - VNE)
+(F_0 = VE/5/(VNE/(30-5-1)))
+(F_alfa = qf(0.05, df1 = 5, df2 = 30-5-1))
+# pvalor
+1 - pf(F_0, 5, 24)
+```
+
+- En R:
+
+```{r}
+summary(m2)
+```
+
+# Contraste para un grupo de coeficientes
+
+Consideremos el modelo de regresión con *k* regresores:
+
+$$
+y = X \beta + u, \ dim(\beta) = k \times 1 
+$$
+
+Y consideremos otro modelo de regresión en el que se utilizan *m < k* regresores:
+
+$$
+y = X' \beta' + u', \ dim(\beta') = m \times 1 
+$$
+
+Sea *VNE(k)* la variabilidad no explicada del primer modelo, y *VNE(m)* la variabilidad no explicada del segundo modelo. Se puede demostrar que:
+
+$$
+F_0 = \frac{(VNE(m)-VNE(k))/(k-m)}{VNE(k)/(n-k-1)} \sim F_{k-m, n-k-1}
+$$
+
+Con este estadístico podemos resolver el contraste 
+
+$$
+H_0 : \text{Los modelos son iguales} \\
+H_1 : \text{Los modelos NO son iguales}
+$$
+
+Si el estadístico toma valores pequeños quiere decir que la varianza residual es parecida en ambos modelos, luego se considera que los modelos son equivalentes.
+
+## Ejemplo: contraste para un regresor
+
+Vamos a analizar si el regresor Area puede eliminarse de la lista. El contraste que resolvemos es $H_0 : \beta_{Area} = 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Para ello lo comparamos con el modelo *Species ~ Elevation + Nearest + Scruz + Adjacent*. Si los modelos son equivalentes quiere decir que $\beta_{Area} = 0$:
+
+```{r}
+m21 = lm(Species ~ Elevation + Nearest + Scruz + Adjacent, data = d2)
+(VNE21 = sum(resid(m21)^2))
+(F_0 = ((VNE21 - VNE)/(5-4))/(VNE/(30-5-1)))
+# pvalor
+1-pf(F_0, 1, 24)
+```
+
+Luego no se puede rechazar la hipótesis nula (los modelos son iguales), luego el regresor Area se puede eliminar de la lista. Se obtiene el mismo resultado que con el contraste de la t-student.
+
+- Con R:
+
+```{r}
+anova(m21, m2)
+```
+
+Es muy importante tener en cuenta la hipótesis nula que se está analizando. Es decir, si analizamos $\beta_{Area} = 0$ en el modelo *Species ~ Area*:
+
+```{r}
+summary(lm(Species ~ Area, data = d2))
+```
+
+tenemos que el área de la isla si influye en el número de especies.
+
+## Ejemplo: el contraste de regresión múltiple
+
+El contraste de regresión múltiple ($H_0 : \beta_{Area} = \beta_{Elevation} = \cdots = \beta_{Adjacent} = 0$) también se puede resolver utilizando este estadístico. Los dos modelos a comparar son: *Species ~ 1 + Area + Elevation + Nearest + Scruz + Adjacent* y *Species ~ 1*. El 1 hace referencia al $\beta_0$, y se estima por defecto si no se indica explicitamente:
+
+```{r}
+m22 = lm(Species ~ 1, d2)
+```
+
+Por tanto
+
+```{r}
+anova(m22, m2)
+```
+
+## Ejemplo: contraste sobre una pareja de regresores
+
+El contraste que resolvemos es $H_0 : \beta_{Area} = \beta_{Adjacent} = 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Para ello lo comparamos con el modelo:
+
+```{r}
+m23 = lm(Species ~ Elevation + Nearest + Scruz, data = d2)
+(VNE23 = sum(resid(m23)^2))
+(F_0 = ((VNE23 - VNE)/2)/(VNE/24))
+# pvalor
+1-pf(F_0, 2, 24)
+```
+
+Luego se rechaza la hipótesis nula.
+
+- Con R:
+
+```{r}
+anova(m23, m2)
+```
+
+## Ejemplo: contraste de igualdad de regresores  
+
+El contraste que resolvemos es $H_0 : \beta_{Area} = \beta_{Adjacent}$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Hacemos la comparación con el modelo:
+
+```{r}
+m24 = lm(Species ~ I(Area + Adjacent) + Elevation + Nearest + Scruz, data = d2)
+(VNE24 = sum(resid(m24)^2))
+(F_0 = ((VNE24 - VNE)/1)/(VNE/24))
+# pvalor
+1-pf(F_0, 1, 24)
+```
+
+- En R:
+
+```{r}
+anova(m24,m2)
+```
+
+
+
+# Contraste incluyendo restricciones
+
+Una manera general de expresar los contrastes anteriores es utilizar restricciones lineales:
+
+$$
+H_0 : H \beta = c \\
+H_1 : H \beta \neq c
+$$
+
+donde *H* es una matriz con *r* restricciones lineales y *c* es un vector de constantes. El estadístico del contraste es:
+
+$$
+\frac{(H \hat \beta - c)^T[H(X^TX)^{-1}H^T]^{-1}(H \hat \beta - c)/r}{VNE/(n-k-1)} \sim F_{r,n-k-1}
+$$
+
+Por ejemplo, supongamos que tenemos el modelo
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_3 x_3 + u
+$$
+
+- El contraste de regresión múltiple $H_0 : \beta_1 = \beta_2 = \beta_3 = 0$ se expresa como:
+
+$$
+H = 
+\begin{bmatrix}
+0 & 1 & 0 & 0 \\
+0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 1
+\end{bmatrix}
+, \
+c =
+\begin{bmatrix}
+0 \\ 0 \\ 0
+\end{bmatrix}
+$$
+
+- el contraste $H_0 : \beta_1 = \beta_3, \ \beta_2 = 0.7$ se expresa como:
+
+$$
+H = 
+\begin{bmatrix}
+0 & 1 & 0 & -1 \\
+0 & 0 & 1 & 0
+\end{bmatrix}
+, \
+c =
+\begin{bmatrix}
+0 \\ 0.7
+\end{bmatrix}
+$$
+
+## Ejemplo: contraste de regresión múltiple
+
+```{r}
+(H1 = cbind(rep(0,5),diag(5)))
+(c1 = matrix(0, nrow = 5, ncol = 1))
+```
+
+```{r}
+(mat1 = H1 %*% coef(m2) - c1)
+X = model.matrix(m2)
+(mat2 = solve(H1 %*% solve(t(X) %*% X) %*% t(H1)))
+```
+
+```{r}
+(F_0 = (t(mat1) %*% mat2 %*% mat1/5) / (VNE/24))
+```
+
+
+

@@ -1,0 +1,180 @@
+---
+title: "Inferencia en el modelo de regresión lineal: intervalos de confianza"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Intervalo de confianza para las $\beta_i$
+
+Hemos visto que
+
+$$
+\hat \beta \rightarrow N(\beta, Q \sigma^2)
+$$
+
+donde $Q = (X^TX)^{-1}$. Esto implica que:
+
+$$
+\hat \beta_i \rightarrow N(\beta_i, Q_{ii} \sigma^2), \ i = 1,2, \ldots,k
+$$
+
+donde $Q_{ij}$ es el elemento *ij* de la matriz Q. Aplicando las propiedades de la distribución normal
+
+$$
+\frac{\hat \beta_i - \beta_i}{\sqrt{Q_{ii} \sigma^2}} \rightarrow N(0,1)
+$$
+
+Por tanto:
+
+$$
+\frac{\hat \beta_i - \beta_i}{se(\hat \beta_i)} \rightarrow t_{n-k-1}
+$$
+
+donde 
+
+$$se(\hat \beta_i) = \sqrt{Q_{ii} \hat s_R^2}$$
+
+Para deducir la expresión anterior se ha tenido en cuenta que
+
+$$
+\frac{N(0,1)}{\sqrt{\frac{\chi^2_n}{n}}} \rightarrow t_n
+$$
+
+Por tanto, el intervalo de confianza $100(1-\alpha)$% se escribe como
+
+$$
+\hat \beta_i \pm t_{n-k-1;\alpha/2} se(\hat \beta_i)
+$$
+
+# Intervalo de confianza para $\sigma^2$
+
+Partimos de la distribución en el muestreo:
+
+$$
+\frac{(n-k-1)\hat s_R^2}{\sigma^2} \rightarrow \chi^2_{n-k-1}
+$$
+
+Despejando:
+
+$$
+\frac{(n-k-1)\hat s_R^2}{\chi^2_{n-k-1;\alpha/2}} \leq \sigma^2 \leq \frac{(n-k-1)\hat s_R^2}{\chi^2_{n-k-1;1-\alpha/2}}
+$$
+
+# Ejemplo 1
+
+```{r}
+d = cars
+str(d)
+```
+
+```{r}
+d$dist_m = d$dist*0.3048
+d$speed_kmh = d$speed*1.60934
+plot(d$speed_kmh, d$dist_m, pch = 19,col = "blue")
+```
+
+```{r}
+m1 = lm(dist_m ~ speed_kmh, data = d)
+(beta_e = coefficients(m1))
+```
+
+```{r}
+plot(d$speed_kmh, d$dist_m, pch = 19,col = "blue", xlim = c(0,45))
+abline(m1, col = "red", lwd = 2)
+```
+
+En R podemos calcular la matriz de varianzas de los parámetros estimados, es decir $var(\hat \beta) = Q_{ii} \hat s_R^2$, mediante:
+
+```{r}
+(beta_var = vcov(m1))
+```
+
+Por tanto, el standard error de los estimadores, $se(\hat \beta_i)$ será
+
+```{r}
+(beta_se = sqrt(diag(beta_var)))
+```
+
+El valor de la t con n-k-1 = 50-2 = 48 grados de libertad es
+
+```{r}
+(t1 = qt(1-0.05/2, df = 48))
+```
+
+El intervalo de confianza para $\beta_0$:
+
+```{r}
+beta_e[1] + c(-1,1)*t1*beta_se[1]
+```
+
+El intervalo de confianza para $\beta_1$:
+
+```{r}
+beta_e[2] + c(-1,1)*t1*beta_se[2]
+```
+
+Directamente, mediante la función *confint()* de R se pueden obtener dichos valores:
+
+```{r}
+confint(m1)
+```
+
+Si queremos otro nivel de confianza, por ejemplo, 90%:
+
+```{r}
+(t2 = qt(1-0.10/2, df = 48))
+(beta_e[1] + c(-1,1)*t2*beta_se[1])
+(beta_e[2] + c(-1,1)*t2*beta_se[2])
+confint(m1, level = 0.90)
+```
+
+El estimador de la varianza del modelo es la varianza residual:
+
+```{r}
+(sR2 = sum(m1$residuals^2)/48)
+```
+
+Y su intervalo de confianza:
+
+```{r}
+c(48*sR2/qchisq(1-0.05/2, df = 48), 48*sR2/qchisq(0.05/2, df = 48))
+```
+
+# Ejemplo 2
+
+```{r}
+d2 = faraway::gala
+str(d2)
+```
+
+```{r}
+m2 = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d2)
+(beta_var2 = vcov(m2))
+```
+
+Por ejemplo, el intervalo de confianza para $\beta_{Scruz}$ es:
+
+```{r}
+coef(m2)[5] + c(-1,1)*qt(1-0.05/2, df = 30-5-1)*sqrt(beta_var2[5,5])
+```
+
+O diréctamente en R:
+
+```{r}
+confint(m2)
+```
+
+
+
+

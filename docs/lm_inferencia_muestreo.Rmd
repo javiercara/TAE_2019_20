@@ -1,0 +1,181 @@
+---
+title: "Inferencia en el modelo de regresión lineal: distribuiciones en el muestreo"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Distribuciones en el muestro de los estimadores de las $\beta_i$
+
+Hemos visto que el modelo de regresión puede escribirse como:
+
+$$
+y = X \beta + \epsilon
+$$
+
+Los parámetros de este modelo se pueden estimar utilizando el método de mínimos cuadrados, obteniendo
+
+$$
+\hat \beta = (X^TX)^{-1}X^Ty
+$$
+
+Si únicamente queremos estimar el vector de parámetros $\beta$, el problema termina aquí. Sin embargo, si queremos calcular intervalos de confianza o realizar contrastes de hipótesis, necesitamos definir la distribución de probabilidad de los errores $\epsilon$. En concreto, vamos a asumir que los errores tienen distribución normal, y son independientes e idénticamente distribuidos con media cero y varianza $\sigma^2$. Es decir:
+
+$$
+\epsilon_i \rightarrow N(0, \sigma^2), \ i = 1,2,\ldots,n
+$$
+
+En forma matricial
+
+$$
+\epsilon \rightarrow N(0, \sigma^2 I)
+$$
+
+donde 0 representa un vector de ceros y $I$ es la matriz identidad de tamaño n. Utilizando el resultado de que la combinación lineal de normales es otra normal se tiene que:
+
+$$
+y \rightarrow N(X\beta, \sigma^2I)
+$$
+
+Efectivamente
+
+$$
+E[y] = E[X \beta + \epsilon] = E[X \beta] + E[\epsilon] = X \beta
+$$
+
+$$
+Var[y] = Var[X \beta + \epsilon] = Var[\epsilon] = \sigma^2 I
+$$
+
+Utilizando el mismo razonamiento, el estimador de $\beta$ también tiene distribución normal
+
+$$
+\hat \beta = (X^TX)^{-1}X^T y \rightarrow N(\beta, (X^TX)^{-1} \sigma^2)
+$$
+
+ya que 
+
+$$
+E[\hat \beta] = E[(X^TX)^{-1}X^T y] = (X^TX)^{-1}X^T E[y] = (X^TX)^{-1}X^T X\beta = \beta
+$$
+
+$$
+Var[\hat \beta] = Var[(X^TX)^{-1}X^T y] = (X^TX)^{-1}X^T Var[y] ((X^TX)^{-1}X^T)^T = (X^TX)^{-1} \sigma^2
+$$
+
+# Distribución en el muestreo del estimador de $\sigma^2$
+
+El modelo tiene ahora un parámetro más, que es la varianza de los errores, $\sigma^2$. Este parámetro también hay que estimarlo. Se puede demostrar que 
+
+$$
+\frac{\sum e_i^2}{\sigma^2} \rightarrow \chi^2_{n-k-1}
+$$
+
+donde n es el número de observaciones y k es el número de regresores. Por ello se propone el siguiente estimador 
+
+$$
+\hat \sigma^2 = \frac{\sum e_i^2}{n-k-1}
+$$
+
+ya que es un estimador insesgado de $\sigma^2$.  Efectivamente
+
+$$
+E[\hat \sigma^2] = E \left[ \frac{\sum e_i^2}{n-k-1} \right] = \sigma^2
+$$
+
+ya que $E[\chi^2_n] = n$. Al término $\sum e_i^2/(n-k-1)$ también se lo conoce como **varianza residual** y se representa por $\hat s_R^2$. 
+
+$$
+\hat s_R^2 = \frac{\sum e_i^2}{n-k-1}
+$$
+
+A la raiz cuadrada se le conoce como **residual standard error**. El término (n-k-1) son los *grados de libertad*. La distribución en el muestreo de la varianza residual es
+
+$$
+\frac{\sum e_i^2}{\sigma^2} \rightarrow \chi^2_{n-k-1} \Rightarrow \frac{(n-k-1)\hat s_R^2}{\sigma^2} \rightarrow \chi^2_{n-k-1}
+$$
+
+
+# Repaso de distribuciones
+
+## Distribucion normal
+
+- Definicion
+
+$$
+f(x) = \frac{1}{\sigma \sqrt{2\pi}}\exp{\left( -\frac{1}{2\sigma^2}(x-\mu)^2 \right)}
+$$
+
+- Grafica
+
+```{r}
+curve(dnorm(x, 0, 1), from = -4, to = 4, col = "blue", lwd = 2)
+```
+
+- Cálculo de probabilidades
+
+```{r}
+pnorm(1.7, 0, 1)
+```
+
+
+```{r}
+curve(dnorm(x, 0, 1), from = -4, to = 4, col = "blue", lwd = 2)
+abline(v = 1.7, col = "red")
+```
+
+- Cálculo de cuantiles
+
+```{r}
+qnorm(0.9554345)
+```
+
+- números aleatorios
+
+```{r}
+x = rnorm(1000, 0, 1)
+hist(x, freq = F)
+curve(dnorm(x, 0, 1), col = "blue", lwd = 2, add = T)
+```
+
+
+## Distribución $\chi^2_n$
+
+- Definición
+
+$$
+Z_i \sim N(0,1) \Rightarrow \boxed{Z_1^2 + Z_2^2 + \cdots + Z_n^2 \sim \chi^2_n}
+$$
+
+```{r}
+curve(dchisq(x, 5), from = 0, to = 100, lwd = 1)
+curve(dchisq(x, 10), col = "blue", lwd = 1, add = T)
+curve(dchisq(x, 50), col = "red", lwd = 1, add = T)
+legend("topright", legend = c("chisq(5)","chisq(10)","chisq(50)"), col = c("black","blue","red"), lty = 1, lwd = 1)
+```
+
+## t-student
+
+
+$$
+\boxed{ \frac{N(0,1)}{\sqrt{\frac{\chi^2_n}{n}}} \sim t_n }
+$$
+
+```{r}
+curve(dnorm(x, 0, 1), from = -5, to = 5, lwd = 1)
+curve(dt(x, 5), col = "blue", lwd = 1, add = T)
+curve(dt(x, 10), col = "red", lwd = 1, add = T)
+legend("topright", legend = c("N(0,1)","t_5","t_10"), col = c("black","blue","red"), lty = 1, lwd = 1)
+```
+
+
+
+

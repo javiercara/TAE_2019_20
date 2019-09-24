@@ -17,7 +17,9 @@ output: html_document
 3. [Regresión lineal con términos de interacción](lm_interaccion.html)
 4. [Fórmulas y expresiones en el modelo de regresión](lm_formulas.html)
 5. [Regresión lineal con variables cualitativas](lm_cualitativas.html)
-
-
+6. Inferencia en el modelo de regresión lineal
+    a. [Distribuciones en el muestreo](lm_inferencia_muestreo.html)
+    b. [Intervalos de confianza](lm_inferencia_intervalos.html)
+    c. [Contrastes de hipótesis](lm_inferencia_contrastes.html)
     
 <br>
