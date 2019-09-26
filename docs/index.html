@@ -7,7 +7,6 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 <meta name="author" content="Javier Cara" />
@@ -344,6 +343,18 @@ summary {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
@@ -387,6 +398,7 @@ summary {
 <li><a href="lm_inferencia_muestreo.html">Distribuciones en el muestreo</a></li>
 <li><a href="lm_inferencia_intervalos.html">Intervalos de confianza</a></li>
 <li><a href="lm_inferencia_contrastes.html">Contrastes de hipótesis</a></li>
+<li><a href="lm_inferencia_bootstrap.html">Bootstrap</a></li>
 </ol></li>
 </ol>
 <p><br></p>
@@ -410,23 +422,6 @@ $(document).ready(function () {
 
 
 </script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

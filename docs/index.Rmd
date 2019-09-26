@@ -21,5 +21,6 @@ output: html_document
     a. [Distribuciones en el muestreo](lm_inferencia_muestreo.html)
     b. [Intervalos de confianza](lm_inferencia_intervalos.html)
     c. [Contrastes de hipótesis](lm_inferencia_contrastes.html)
+    d. [Bootstrap](lm_inferencia_bootstrap.html)
     
 <br>

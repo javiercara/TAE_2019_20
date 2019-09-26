@@ -57,79 +57,26 @@ Por tanto
 - si $pvalor \leq \alpha$: se rechaza $H_0$
 - si $pvalor \geq \alpha$: no se rechaza $H_0$
 
-## Ejemplo 1
-
-- Datos:
+## Ejemplo
 
 ```{r}
-d = cars
-d$dist_m = d$dist*0.3048
-d$speed_kmh = d$speed*1.60934
-str(d)
-```
-
-- Estimación del modelo:
-
-```{r}
-m1 = lm(dist_m ~ speed_kmh, data = d)
-(beta_e = coefficients(m1))
-(beta_var = vcov(m1))
-(beta_se = sqrt(diag(beta_var)))
-```
-
-- El contraste que vamos a resolver es:
-
-$$
-H_0: \beta_0 = 0 \\
-H_1: \beta_0 \neq 0
-$$
-
-- Cálculo del $t_0$:
-
-```{r}
-(t0 = beta_e[1]/beta_se[1])
-```
-
-- Solución del contraste:
-
-```{r}
-(t_lim = qt(0.05/2, df = 48))
-```
-
-como t_lim < t0, se rechaza Ho.
-
-- pvalor
-
-```{r}
-(pvalor = 2*pt(t0, 48))
-```
-
-- Solución del contraste con R:
-
-```{r}
+d = faraway::gala
+m1 = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d)
 summary(m1)
 ```
 
-## Ejemplo 2
-
-```{r}
-d2 = faraway::gala
-m2 = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d2)
-summary(m2)
-```
-
-Veamos de donde salen los valores de la tabla anterior. Por ejemplo, para $\beta_{Scruz}$:
+Veamos de donde salen los valores de la tabla anterior:
 
 - Estimate:
 
 ```{r}
-(beta_e = coefficients(m2))
+(beta_e = coefficients(m1))
 ```
 
 - Std. Error:
 
 ```{r}
-(beta_se = sqrt(diag(vcov(m2))))
+(beta_se = sqrt(diag(vcov(m1))))
 ```
 
 - t value:
@@ -149,6 +96,33 @@ Veamos de donde salen los valores de la tabla anterior. Por ejemplo, para $\beta
 ```{r}
 data.frame(beta_e, beta_se, t_value, pvalores)
 ```
+
+# Relación entre intervalos de confianza y contrastes
+
+En el caso de contrastes bilaterales:
+
+$$
+H_0: \beta_i = 0 \\
+H_1: \beta_i \neq 0
+$$
+
+Y con intervalo de confianza:
+
+$$
+\beta_i \in (a_i, b_i)
+$$
+
+- Si $0 \in (a_i, b_i) \Rightarrow$ no se rechaza $H_0$.
+- Si $0 \notin (a_i, b_i) \Rightarrow$ se rechaza $H_0$.
+
+En el caso del ejemplo, si miramos pvalores e intervalos:
+
+```{r}
+confint(m1)
+summary(m1)
+```
+
+Por ejemplo, $\beta_{Area} \in (-0.0702158, 0.02233912)$ que contiene el cero. Por otro lado, pvalor = $0.296318 < 0.05$.
 
 # Contraste para $\sigma^2$
 
@@ -171,20 +145,20 @@ $$
 \chi^2_0 = \frac{(n-k-1)\hat s_R^2}{\sigma^2_0} \rightarrow \chi^2_{n-k-1}
 $$
 
-Como ejemplo, en el modelo m1 vamos a contrastar
+Como ejemplo, vamos a contrastar
 
 $$
-H_0 : \sigma^2 = 25 \\
-H_1 : \sigma^2 \neq 25
+H_0 : \sigma^2 = 65^2 \\
+H_1 : \sigma^2 \neq 65^2
 $$
 
 ```{r}
-(chisq_0 = sum(resid(m1)^2)/25)
+(chisq_0 = sum(resid(m1)^2)/65^2)
 # contraste bilateral
-c(qchisq(0.05/2,df = 48), qchisq(1-0.05/2,df = 48))
+c(qchisq(0.05/2,df = 24), qchisq(1-0.05/2,df = 24))
 ```
 
-Por tanto no se rechaza la hipótesis nula.
+Por tanto no se rechaza la hipótesis nula. Elm ismo resultado se obtiene mirando el intervalo de confianza.
 
 # Contraste de regresión múltiple
 
@@ -252,8 +226,8 @@ Se rechazará la hipótesis nula para valores grandes del estadístico:
 Queremos contrastar si $\beta_{Area} = \beta_{Elevation} = \beta_{Nearest}  = \beta_{Scruz} = \beta_{Adjacent}= 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*, es decir, si hay relación lineal entre el número de especies y estos regresores.
 
 ```{r}
-(VT = sum((d2$Species - mean(d2$Species))^2) )
-(VNE = sum(resid(m2)^2))
+(VT = sum((d$Species - mean(d$Species))^2) )
+(VNE = sum(resid(m1)^2))
 (VE = VT - VNE)
 (F_0 = VE/5/(VNE/(30-5-1)))
 (F_alfa = qf(0.05, df1 = 5, df2 = 30-5-1))
@@ -264,7 +238,7 @@ Queremos contrastar si $\beta_{Area} = \beta_{Elevation} = \beta_{Nearest}  = \b
 - En R:
 
 ```{r}
-summary(m2)
+summary(m1)
 ```
 
 # Contraste para un grupo de coeficientes
@@ -301,9 +275,9 @@ Si el estadístico toma valores pequeños quiere decir que la varianza residual 
 Vamos a analizar si el regresor Area puede eliminarse de la lista. El contraste que resolvemos es $H_0 : \beta_{Area} = 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Para ello lo comparamos con el modelo *Species ~ Elevation + Nearest + Scruz + Adjacent*. Si los modelos son equivalentes quiere decir que $\beta_{Area} = 0$:
 
 ```{r}
-m21 = lm(Species ~ Elevation + Nearest + Scruz + Adjacent, data = d2)
-(VNE21 = sum(resid(m21)^2))
-(F_0 = ((VNE21 - VNE)/(5-4))/(VNE/(30-5-1)))
+m2 = lm(Species ~ Elevation + Nearest + Scruz + Adjacent, data = d)
+(VNE2 = sum(resid(m2)^2))
+(F_0 = ((VNE2 - VNE)/(5-4))/(VNE/(30-5-1)))
 # pvalor
 1-pf(F_0, 1, 24)
 ```
@@ -313,13 +287,13 @@ Luego no se puede rechazar la hipótesis nula (los modelos son iguales), luego e
 - Con R:
 
 ```{r}
-anova(m21, m2)
+anova(m2, m1)
 ```
 
 Es muy importante tener en cuenta la hipótesis nula que se está analizando. Es decir, si analizamos $\beta_{Area} = 0$ en el modelo *Species ~ Area*:
 
 ```{r}
-summary(lm(Species ~ Area, data = d2))
+summary(lm(Species ~ Area, data = d))
 ```
 
 tenemos que el área de la isla si influye en el número de especies.
@@ -329,13 +303,13 @@ tenemos que el área de la isla si influye en el número de especies.
 El contraste de regresión múltiple ($H_0 : \beta_{Area} = \beta_{Elevation} = \cdots = \beta_{Adjacent} = 0$) también se puede resolver utilizando este estadístico. Los dos modelos a comparar son: *Species ~ 1 + Area + Elevation + Nearest + Scruz + Adjacent* y *Species ~ 1*. El 1 hace referencia al $\beta_0$, y se estima por defecto si no se indica explicitamente:
 
 ```{r}
-m22 = lm(Species ~ 1, d2)
+m3 = lm(Species ~ 1, d)
 ```
 
 Por tanto
 
 ```{r}
-anova(m22, m2)
+anova(m3, m1)
 ```
 
 ## Ejemplo: contraste sobre una pareja de regresores
@@ -343,9 +317,9 @@ anova(m22, m2)
 El contraste que resolvemos es $H_0 : \beta_{Area} = \beta_{Adjacent} = 0$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Para ello lo comparamos con el modelo:
 
 ```{r}
-m23 = lm(Species ~ Elevation + Nearest + Scruz, data = d2)
-(VNE23 = sum(resid(m23)^2))
-(F_0 = ((VNE23 - VNE)/2)/(VNE/24))
+m4 = lm(Species ~ Elevation + Nearest + Scruz, data = d)
+(VNE4 = sum(resid(m4)^2))
+(F_0 = ((VNE4 - VNE)/2)/(VNE/24))
 # pvalor
 1-pf(F_0, 2, 24)
 ```
@@ -355,7 +329,7 @@ Luego se rechaza la hipótesis nula.
 - Con R:
 
 ```{r}
-anova(m23, m2)
+anova(m4, m1)
 ```
 
 ## Ejemplo: contraste de igualdad de regresores  
@@ -363,9 +337,9 @@ anova(m23, m2)
 El contraste que resolvemos es $H_0 : \beta_{Area} = \beta_{Adjacent}$ en el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*. Hacemos la comparación con el modelo:
 
 ```{r}
-m24 = lm(Species ~ I(Area + Adjacent) + Elevation + Nearest + Scruz, data = d2)
-(VNE24 = sum(resid(m24)^2))
-(F_0 = ((VNE24 - VNE)/1)/(VNE/24))
+m5 = lm(Species ~ I(Area + Adjacent) + Elevation + Nearest + Scruz, data = d)
+(VNE5 = sum(resid(m5)^2))
+(F_0 = ((VNE5 - VNE)/1)/(VNE/24))
 # pvalor
 1-pf(F_0, 1, 24)
 ```
@@ -373,5 +347,5 @@ m24 = lm(Species ~ I(Area + Adjacent) + Elevation + Nearest + Scruz, data = d2)
 - En R:
 
 ```{r}
-anova(m24,m2)
+anova(m5,m1)
 ```

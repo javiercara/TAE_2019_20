@@ -1,5 +1,5 @@
 ---
-title: "Inferencia en el modelo de regresión lineal: intervalos de confianza"
+title: "Inferencia en el modelo de regresión lineal: bootstrap"
 date: "`r format(Sys.time(), '%d %B %Y')`"
 output: 
   html_document:

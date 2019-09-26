@@ -1609,7 +1609,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Inferencia en el modelo de regresión lineal: contrastes de hipótesis</h1>
-<h4 class="date">24 septiembre 2019</h4>
+<h4 class="date">25 septiembre 2019</h4>
 
 </div>
 
@@ -1649,91 +1649,15 @@ pvalor = 2 P(t_{n-k-1} \geq |t_0|)
 <li>si <span class="math inline">\(pvalor \geq \alpha\)</span>: no se rechaza <span class="math inline">\(H_0\)</span></li>
 </ul>
 </div>
-<div id="ejemplo-1" class="section level2">
-<h2><span class="header-section-number">1.2</span> Ejemplo 1</h2>
-<ul>
-<li>Datos:</li>
-</ul>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">d =<span class="st"> </span>cars</a>
-<a class="sourceLine" id="cb1-2" data-line-number="2">d<span class="op">$</span>dist_m =<span class="st"> </span>d<span class="op">$</span>dist<span class="op">*</span><span class="fl">0.3048</span></a>
-<a class="sourceLine" id="cb1-3" data-line-number="3">d<span class="op">$</span>speed_kmh =<span class="st"> </span>d<span class="op">$</span>speed<span class="op">*</span><span class="fl">1.60934</span></a>
-<a class="sourceLine" id="cb1-4" data-line-number="4"><span class="kw">str</span>(d)</a></code></pre></div>
-<pre><code>## 'data.frame':    50 obs. of  4 variables:
-##  $ speed    : num  4 4 7 7 8 9 10 10 10 11 ...
-##  $ dist     : num  2 10 4 22 16 10 18 26 34 17 ...
-##  $ dist_m   : num  0.61 3.05 1.22 6.71 4.88 ...
-##  $ speed_kmh: num  6.44 6.44 11.27 11.27 12.87 ...</code></pre>
-<ul>
-<li>Estimación del modelo:</li>
-</ul>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">m1 =<span class="st"> </span><span class="kw">lm</span>(dist_m <span class="op">~</span><span class="st"> </span>speed_kmh, <span class="dt">data =</span> d)</a>
-<a class="sourceLine" id="cb3-2" data-line-number="2">(<span class="dt">beta_e =</span> <span class="kw">coefficients</span>(m1))</a></code></pre></div>
-<pre><code>## (Intercept)   speed_kmh 
-##  -5.3581081   0.7447762</code></pre>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">(<span class="dt">beta_var =</span> <span class="kw">vcov</span>(m1))</a></code></pre></div>
-<pre><code>##             (Intercept)    speed_kmh
-## (Intercept)    4.243487 -0.153487003
-## speed_kmh     -0.153487  0.006193029</code></pre>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">(<span class="dt">beta_se =</span> <span class="kw">sqrt</span>(<span class="kw">diag</span>(beta_var)))</a></code></pre></div>
-<pre><code>## (Intercept)   speed_kmh 
-##   2.0599726   0.0786958</code></pre>
-<ul>
-<li>El contraste que vamos a resolver es:</li>
-</ul>
-<p><span class="math display">\[
-H_0: \beta_0 = 0 \\
-H_1: \beta_0 \neq 0
-\]</span></p>
-<ul>
-<li>Cálculo del <span class="math inline">\(t_0\)</span>:</li>
-</ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">(<span class="dt">t0 =</span> beta_e[<span class="dv">1</span>]<span class="op">/</span>beta_se[<span class="dv">1</span>])</a></code></pre></div>
-<pre><code>## (Intercept) 
-##   -2.601058</code></pre>
-<ul>
-<li>Solución del contraste:</li>
-</ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">(<span class="dt">t_lim =</span> <span class="kw">qt</span>(<span class="fl">0.05</span><span class="op">/</span><span class="dv">2</span>, <span class="dt">df =</span> <span class="dv">48</span>))</a></code></pre></div>
-<pre><code>## [1] -2.010635</code></pre>
-<p>como t_lim &lt; t0, se rechaza Ho.</p>
-<ul>
-<li>pvalor</li>
-</ul>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1">(<span class="dt">pvalor =</span> <span class="dv">2</span><span class="op">*</span><span class="kw">pt</span>(t0, <span class="dv">48</span>))</a></code></pre></div>
-<pre><code>## (Intercept) 
-##  0.01231882</code></pre>
-<ul>
-<li>Solución del contraste con R:</li>
-</ul>
-<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">summary</span>(m1)</a></code></pre></div>
-<pre><code>## 
-## Call:
-## lm(formula = dist_m ~ speed_kmh, data = d)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -8.8603 -2.9033 -0.6925  2.8086 13.1678 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  -5.3581     2.0600  -2.601   0.0123 *  
-## speed_kmh     0.7448     0.0787   9.464 1.49e-12 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 4.688 on 48 degrees of freedom
-## Multiple R-squared:  0.6511, Adjusted R-squared:  0.6438 
-## F-statistic: 89.57 on 1 and 48 DF,  p-value: 1.49e-12</code></pre>
-</div>
-<div id="ejemplo-2" class="section level2">
-<h2><span class="header-section-number">1.3</span> Ejemplo 2</h2>
-<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">d2 =<span class="st"> </span>faraway<span class="op">::</span>gala</a>
-<a class="sourceLine" id="cb17-2" data-line-number="2">m2 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Area <span class="op">+</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz <span class="op">+</span><span class="st"> </span>Adjacent, <span class="dt">data =</span> d2)</a>
-<a class="sourceLine" id="cb17-3" data-line-number="3"><span class="kw">summary</span>(m2)</a></code></pre></div>
+<div id="ejemplo" class="section level2">
+<h2><span class="header-section-number">1.2</span> Ejemplo</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">d =<span class="st"> </span>faraway<span class="op">::</span>gala</a>
+<a class="sourceLine" id="cb1-2" data-line-number="2">m1 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Area <span class="op">+</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz <span class="op">+</span><span class="st"> </span>Adjacent, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw">summary</span>(m1)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = Species ~ Area + Elevation + Nearest + Scruz + Adjacent, 
-##     data = d2)
+##     data = d)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -1753,11 +1677,11 @@ H_1: \beta_0 \neq 0
 ## Residual standard error: 60.98 on 24 degrees of freedom
 ## Multiple R-squared:  0.7658, Adjusted R-squared:  0.7171 
 ## F-statistic:  15.7 on 5 and 24 DF,  p-value: 6.838e-07</code></pre>
-<p>Veamos de donde salen los valores de la tabla anterior. Por ejemplo, para <span class="math inline">\(\beta_{Scruz}\)</span>:</p>
+<p>Veamos de donde salen los valores de la tabla anterior:</p>
 <ul>
 <li>Estimate:</li>
 </ul>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1">(<span class="dt">beta_e =</span> <span class="kw">coefficients</span>(m2))</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">(<span class="dt">beta_e =</span> <span class="kw">coefficients</span>(m1))</a></code></pre></div>
 <pre><code>##  (Intercept)         Area    Elevation      Nearest        Scruz 
 ##  7.068220709 -0.023938338  0.319464761  0.009143961 -0.240524230 
 ##     Adjacent 
@@ -1765,13 +1689,13 @@ H_1: \beta_0 \neq 0
 <ul>
 <li>Std. Error:</li>
 </ul>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">(<span class="dt">beta_se =</span> <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(m2))))</a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">(<span class="dt">beta_se =</span> <span class="kw">sqrt</span>(<span class="kw">diag</span>(<span class="kw">vcov</span>(m1))))</a></code></pre></div>
 <pre><code>## (Intercept)        Area   Elevation     Nearest       Scruz    Adjacent 
 ## 19.15419782  0.02242235  0.05366280  1.05413595  0.21540225  0.01770019</code></pre>
 <ul>
 <li>t value:</li>
 </ul>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">(<span class="dt">t_value =</span> beta_e<span class="op">/</span>beta_se)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">(<span class="dt">t_value =</span> beta_e<span class="op">/</span>beta_se)</a></code></pre></div>
 <pre><code>##  (Intercept)         Area    Elevation      Nearest        Scruz 
 ##  0.369016796 -1.067610554  5.953187968  0.008674366 -1.116628222 
 ##     Adjacent 
@@ -1779,7 +1703,7 @@ H_1: \beta_0 \neq 0
 <ul>
 <li>Pr(&gt;|t|) (es decir, p-valores):</li>
 </ul>
-<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">(<span class="dt">pvalores =</span> <span class="dv">2</span><span class="op">*</span><span class="kw">pt</span>(<span class="kw">abs</span>(t_value), <span class="dt">df =</span> <span class="dv">24</span>, <span class="dt">lower.tail =</span> F))</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">(<span class="dt">pvalores =</span> <span class="dv">2</span><span class="op">*</span><span class="kw">pt</span>(<span class="kw">abs</span>(t_value), <span class="dt">df =</span> <span class="dv">24</span>, <span class="dt">lower.tail =</span> F))</a></code></pre></div>
 <pre><code>##  (Intercept)         Area    Elevation      Nearest        Scruz 
 ## 7.153508e-01 2.963180e-01 3.823409e-06 9.931506e-01 2.752082e-01 
 ##     Adjacent 
@@ -1787,7 +1711,7 @@ H_1: \beta_0 \neq 0
 <ul>
 <li>Si juntamos todo en una tabla:</li>
 </ul>
-<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1"><span class="kw">data.frame</span>(beta_e, beta_se, t_value, pvalores)</a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1"><span class="kw">data.frame</span>(beta_e, beta_se, t_value, pvalores)</a></code></pre></div>
 <pre><code>##                   beta_e     beta_se      t_value     pvalores
 ## (Intercept)  7.068220709 19.15419782  0.369016796 7.153508e-01
 ## Area        -0.023938338  0.02242235 -1.067610554 2.963180e-01
@@ -1797,8 +1721,58 @@ H_1: \beta_0 \neq 0
 ## Adjacent    -0.074804832  0.01770019 -4.226216850 2.970655e-04</code></pre>
 </div>
 </div>
+<div id="relacion-entre-intervalos-de-confianza-y-contrastes" class="section level1">
+<h1><span class="header-section-number">2</span> Relación entre intervalos de confianza y contrastes</h1>
+<p>En el caso de contrastes bilaterales:</p>
+<p><span class="math display">\[
+H_0: \beta_i = 0 \\
+H_1: \beta_i \neq 0
+\]</span></p>
+<p>Y con intervalo de confianza:</p>
+<p><span class="math display">\[
+\beta_i \in (a_i, b_i)
+\]</span></p>
+<ul>
+<li>Si <span class="math inline">\(0 \in (a_i, b_i) \Rightarrow\)</span> no se rechaza <span class="math inline">\(H_0\)</span>.</li>
+<li>Si <span class="math inline">\(0 \notin (a_i, b_i) \Rightarrow\)</span> se rechaza <span class="math inline">\(H_0\)</span>.</li>
+</ul>
+<p>En el caso del ejemplo, si miramos pvalores e intervalos:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw">confint</span>(m1)</a></code></pre></div>
+<pre><code>##                   2.5 %      97.5 %
+## (Intercept) -32.4641006 46.60054205
+## Area         -0.0702158  0.02233912
+## Elevation     0.2087102  0.43021935
+## Nearest      -2.1664857  2.18477363
+## Scruz        -0.6850926  0.20404416
+## Adjacent     -0.1113362 -0.03827344</code></pre>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb15-1" data-line-number="1"><span class="kw">summary</span>(m1)</a></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = Species ~ Area + Elevation + Nearest + Scruz + Adjacent, 
+##     data = d)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -111.679  -34.898   -7.862   33.460  182.584 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  7.068221  19.154198   0.369 0.715351    
+## Area        -0.023938   0.022422  -1.068 0.296318    
+## Elevation    0.319465   0.053663   5.953 3.82e-06 ***
+## Nearest      0.009144   1.054136   0.009 0.993151    
+## Scruz       -0.240524   0.215402  -1.117 0.275208    
+## Adjacent    -0.074805   0.017700  -4.226 0.000297 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 60.98 on 24 degrees of freedom
+## Multiple R-squared:  0.7658, Adjusted R-squared:  0.7171 
+## F-statistic:  15.7 on 5 and 24 DF,  p-value: 6.838e-07</code></pre>
+<p>Por ejemplo, <span class="math inline">\(\beta_{Area} \in (-0.0702158, 0.02233912)\)</span> que contiene el cero. Por otro lado, pvalor = <span class="math inline">\(0.296318 &lt; 0.05\)</span>.</p>
+</div>
 <div id="contraste-para-sigma2" class="section level1">
-<h1><span class="header-section-number">2</span> Contraste para <span class="math inline">\(\sigma^2\)</span></h1>
+<h1><span class="header-section-number">3</span> Contraste para <span class="math inline">\(\sigma^2\)</span></h1>
 <p>El contraste es:</p>
 <p><span class="math display">\[
 H_0 : \sigma^2 = \sigma^2_0 \\
@@ -1812,29 +1786,29 @@ H_1 : \sigma^2 \neq \sigma^2_0
 <p><span class="math display">\[
 \chi^2_0 = \frac{(n-k-1)\hat s_R^2}{\sigma^2_0} \rightarrow \chi^2_{n-k-1}
 \]</span></p>
-<p>Como ejemplo, en el modelo m1 vamos a contrastar</p>
+<p>Como ejemplo, vamos a contrastar</p>
 <p><span class="math display">\[
-H_0 : \sigma^2 = 25 \\
-H_1 : \sigma^2 \neq 25
+H_0 : \sigma^2 = 65^2 \\
+H_1 : \sigma^2 \neq 65^2
 \]</span></p>
-<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">(<span class="dt">chisq_0 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m1)<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span><span class="dv">25</span>)</a></code></pre></div>
-<pre><code>## [1] 42.19106</code></pre>
-<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="co"># contraste bilateral</span></a>
-<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="kw">c</span>(<span class="kw">qchisq</span>(<span class="fl">0.05</span><span class="op">/</span><span class="dv">2</span>,<span class="dt">df =</span> <span class="dv">48</span>), <span class="kw">qchisq</span>(<span class="dv">1</span><span class="fl">-0.05</span><span class="op">/</span><span class="dv">2</span>,<span class="dt">df =</span> <span class="dv">48</span>))</a></code></pre></div>
-<pre><code>## [1] 30.75451 69.02259</code></pre>
-<p>Por tanto no se rechaza la hipótesis nula.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" data-line-number="1">(<span class="dt">chisq_0 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m1)<span class="op">^</span><span class="dv">2</span>)<span class="op">/</span><span class="dv">65</span><span class="op">^</span><span class="dv">2</span>)</a></code></pre></div>
+<pre><code>## [1] 21.11985</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" data-line-number="1"><span class="co"># contraste bilateral</span></a>
+<a class="sourceLine" id="cb19-2" data-line-number="2"><span class="kw">c</span>(<span class="kw">qchisq</span>(<span class="fl">0.05</span><span class="op">/</span><span class="dv">2</span>,<span class="dt">df =</span> <span class="dv">24</span>), <span class="kw">qchisq</span>(<span class="dv">1</span><span class="fl">-0.05</span><span class="op">/</span><span class="dv">2</span>,<span class="dt">df =</span> <span class="dv">24</span>))</a></code></pre></div>
+<pre><code>## [1] 12.40115 39.36408</code></pre>
+<p>Por tanto no se rechaza la hipótesis nula. Elm ismo resultado se obtiene mirando el intervalo de confianza.</p>
 </div>
 <div id="contraste-de-regresion-multiple" class="section level1">
-<h1><span class="header-section-number">3</span> Contraste de regresión múltiple</h1>
+<h1><span class="header-section-number">4</span> Contraste de regresión múltiple</h1>
 <div id="la-distribucion-f" class="section level2">
-<h2><span class="header-section-number">3.1</span> La distribución <em>F</em></h2>
+<h2><span class="header-section-number">4.1</span> La distribución <em>F</em></h2>
 <p>Sean una <span class="math inline">\(\chi^2_m\)</span> y una <span class="math inline">\(\chi^2_n\)</span>, ambas independientes. La distribución F se define como</p>
 <p><span class="math display">\[
 \frac{\chi^2_m / m}{\chi^2_n / n} \sim F_{m,n}
 \]</span></p>
 </div>
 <div id="descomposicion-de-la-variabilidad" class="section level2">
-<h2><span class="header-section-number">3.2</span> Descomposición de la variabilidad</h2>
+<h2><span class="header-section-number">4.2</span> Descomposición de la variabilidad</h2>
 <p>Tenemos el modelo</p>
 <p><span class="math display">\[
 y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \cdots + \hat \beta_k x_{ki} + e_i = \hat y_i + e_i
@@ -1854,7 +1828,7 @@ y_i - \bar y = \hat y_i - \bar y + e_i
 </ul>
 </div>
 <div id="contraste" class="section level2">
-<h2><span class="header-section-number">3.3</span> Contraste</h2>
+<h2><span class="header-section-number">4.3</span> Contraste</h2>
 <p>Es el contraste más importante en regresión múltiple, ya que establece si alguno de los regresores influye en la respuesta. Es decir, en el modelo <span class="math inline">\(y_i = \beta_0 + \beta_1 x_{1i} + \cdots + \beta_k x_{ki} + u_i\)</span> se constrasta si</p>
 <p><span class="math display">\[
 H_0 : \beta_1 = \beta_2 = \cdots = \beta_k = 0 \\
@@ -1876,30 +1850,30 @@ H_1 : \text{Algún } \beta_i \neq 0
 <li>si <span class="math inline">\(F_0 \leq F_\alpha\)</span>: no se rechaza <span class="math inline">\(H_0\)</span></li>
 </ul>
 </div>
-<div id="ejemplo" class="section level2">
-<h2><span class="header-section-number">3.4</span> Ejemplo</h2>
+<div id="ejemplo-1" class="section level2">
+<h2><span class="header-section-number">4.4</span> Ejemplo</h2>
 <p>Queremos contrastar si <span class="math inline">\(\beta_{Area} = \beta_{Elevation} = \beta_{Nearest} = \beta_{Scruz} = \beta_{Adjacent}= 0\)</span> en el modelo <em>Species ~ Area + Elevation + Nearest + Scruz + Adjacent</em>, es decir, si hay relación lineal entre el número de especies y estos regresores.</p>
-<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1">(<span class="dt">VT =</span> <span class="kw">sum</span>((d2<span class="op">$</span>Species <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(d2<span class="op">$</span>Species))<span class="op">^</span><span class="dv">2</span>) )</a></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" data-line-number="1">(<span class="dt">VT =</span> <span class="kw">sum</span>((d<span class="op">$</span>Species <span class="op">-</span><span class="st"> </span><span class="kw">mean</span>(d<span class="op">$</span>Species))<span class="op">^</span><span class="dv">2</span>) )</a></code></pre></div>
 <pre><code>## [1] 381081.4</code></pre>
-<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">(<span class="dt">VNE =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m2)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" data-line-number="1">(<span class="dt">VNE =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m1)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
 <pre><code>## [1] 89231.37</code></pre>
-<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">(<span class="dt">VE =</span> VT <span class="op">-</span><span class="st"> </span>VNE)</a></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb25-1" data-line-number="1">(<span class="dt">VE =</span> VT <span class="op">-</span><span class="st"> </span>VNE)</a></code></pre></div>
 <pre><code>## [1] 291850</code></pre>
-<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1">(<span class="dt">F_0 =</span> VE<span class="op">/</span><span class="dv">5</span><span class="op">/</span>(VNE<span class="op">/</span>(<span class="dv">30-5-1</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb27-1" data-line-number="1">(<span class="dt">F_0 =</span> VE<span class="op">/</span><span class="dv">5</span><span class="op">/</span>(VNE<span class="op">/</span>(<span class="dv">30-5-1</span>)))</a></code></pre></div>
 <pre><code>## [1] 15.69941</code></pre>
-<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1">(<span class="dt">F_alfa =</span> <span class="kw">qf</span>(<span class="fl">0.05</span>, <span class="dt">df1 =</span> <span class="dv">5</span>, <span class="dt">df2 =</span> <span class="dv">30-5-1</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb29-1" data-line-number="1">(<span class="dt">F_alfa =</span> <span class="kw">qf</span>(<span class="fl">0.05</span>, <span class="dt">df1 =</span> <span class="dv">5</span>, <span class="dt">df2 =</span> <span class="dv">30-5-1</span>))</a></code></pre></div>
 <pre><code>## [1] 0.2208894</code></pre>
-<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="co"># pvalor</span></a>
-<a class="sourceLine" id="cb43-2" data-line-number="2"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">24</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb31-1" data-line-number="1"><span class="co"># pvalor</span></a>
+<a class="sourceLine" id="cb31-2" data-line-number="2"><span class="dv">1</span> <span class="op">-</span><span class="st"> </span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">5</span>, <span class="dv">24</span>)</a></code></pre></div>
 <pre><code>## [1] 6.837893e-07</code></pre>
 <ul>
 <li>En R:</li>
 </ul>
-<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1"><span class="kw">summary</span>(m2)</a></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="kw">summary</span>(m1)</a></code></pre></div>
 <pre><code>## 
 ## Call:
 ## lm(formula = Species ~ Area + Elevation + Nearest + Scruz + Adjacent, 
-##     data = d2)
+##     data = d)
 ## 
 ## Residuals:
 ##      Min       1Q   Median       3Q      Max 
@@ -1922,7 +1896,7 @@ H_1 : \text{Algún } \beta_i \neq 0
 </div>
 </div>
 <div id="contraste-para-un-grupo-de-coeficientes" class="section level1">
-<h1><span class="header-section-number">4</span> Contraste para un grupo de coeficientes</h1>
+<h1><span class="header-section-number">5</span> Contraste para un grupo de coeficientes</h1>
 <p>Consideremos el modelo de regresión con <em>k</em> regresores:</p>
 <p><span class="math display">\[
 y = X \beta + u, \ dim(\beta) = k \times 1 
@@ -1942,21 +1916,21 @@ H_1 : \text{Los modelos NO son iguales}
 \]</span></p>
 <p>Si el estadístico toma valores pequeños quiere decir que la varianza residual es parecida en ambos modelos, luego se considera que los modelos son equivalentes.</p>
 <div id="ejemplo-contraste-para-un-regresor" class="section level2">
-<h2><span class="header-section-number">4.1</span> Ejemplo: contraste para un regresor</h2>
+<h2><span class="header-section-number">5.1</span> Ejemplo: contraste para un regresor</h2>
 <p>Vamos a analizar si el regresor Area puede eliminarse de la lista. El contraste que resolvemos es <span class="math inline">\(H_0 : \beta_{Area} = 0\)</span> en el modelo <em>Species ~ Area + Elevation + Nearest + Scruz + Adjacent</em>. Para ello lo comparamos con el modelo <em>Species ~ Elevation + Nearest + Scruz + Adjacent</em>. Si los modelos son equivalentes quiere decir que <span class="math inline">\(\beta_{Area} = 0\)</span>:</p>
-<div class="sourceCode" id="cb47"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb47-1" data-line-number="1">m21 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz <span class="op">+</span><span class="st"> </span>Adjacent, <span class="dt">data =</span> d2)</a>
-<a class="sourceLine" id="cb47-2" data-line-number="2">(<span class="dt">VNE21 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m21)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb35-1" data-line-number="1">m2 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz <span class="op">+</span><span class="st"> </span>Adjacent, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb35-2" data-line-number="2">(<span class="dt">VNE2 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m2)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
 <pre><code>## [1] 93469.08</code></pre>
-<div class="sourceCode" id="cb49"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb49-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE21 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span>(<span class="dv">5-4</span>))<span class="op">/</span>(VNE<span class="op">/</span>(<span class="dv">30-5-1</span>)))</a></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb37-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE2 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span>(<span class="dv">5-4</span>))<span class="op">/</span>(VNE<span class="op">/</span>(<span class="dv">30-5-1</span>)))</a></code></pre></div>
 <pre><code>## [1] 1.139792</code></pre>
-<div class="sourceCode" id="cb51"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb51-1" data-line-number="1"><span class="co"># pvalor</span></a>
-<a class="sourceLine" id="cb51-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">24</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb39-1" data-line-number="1"><span class="co"># pvalor</span></a>
+<a class="sourceLine" id="cb39-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">24</span>)</a></code></pre></div>
 <pre><code>## [1] 0.296318</code></pre>
 <p>Luego no se puede rechazar la hipótesis nula (los modelos son iguales), luego el regresor Area se puede eliminar de la lista. Se obtiene el mismo resultado que con el contraste de la t-student.</p>
 <ul>
 <li>Con R:</li>
 </ul>
-<div class="sourceCode" id="cb53"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb53-1" data-line-number="1"><span class="kw">anova</span>(m21, m2)</a></code></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb41-1" data-line-number="1"><span class="kw">anova</span>(m2, m1)</a></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: Species ~ Elevation + Nearest + Scruz + Adjacent
@@ -1965,10 +1939,10 @@ H_1 : \text{Los modelos NO son iguales}
 ## 1     25 93469                           
 ## 2     24 89231  1    4237.7 1.1398 0.2963</code></pre>
 <p>Es muy importante tener en cuenta la hipótesis nula que se está analizando. Es decir, si analizamos <span class="math inline">\(\beta_{Area} = 0\)</span> en el modelo <em>Species ~ Area</em>:</p>
-<div class="sourceCode" id="cb55"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb55-1" data-line-number="1"><span class="kw">summary</span>(<span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Area, <span class="dt">data =</span> d2))</a></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb43-1" data-line-number="1"><span class="kw">summary</span>(<span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Area, <span class="dt">data =</span> d))</a></code></pre></div>
 <pre><code>## 
 ## Call:
-## lm(formula = Species ~ Area, data = d2)
+## lm(formula = Species ~ Area, data = d)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
@@ -1987,11 +1961,11 @@ H_1 : \text{Los modelos NO son iguales}
 <p>tenemos que el área de la isla si influye en el número de especies.</p>
 </div>
 <div id="ejemplo-el-contraste-de-regresion-multiple" class="section level2">
-<h2><span class="header-section-number">4.2</span> Ejemplo: el contraste de regresión múltiple</h2>
+<h2><span class="header-section-number">5.2</span> Ejemplo: el contraste de regresión múltiple</h2>
 <p>El contraste de regresión múltiple (<span class="math inline">\(H_0 : \beta_{Area} = \beta_{Elevation} = \cdots = \beta_{Adjacent} = 0\)</span>) también se puede resolver utilizando este estadístico. Los dos modelos a comparar son: <em>Species ~ 1 + Area + Elevation + Nearest + Scruz + Adjacent</em> y <em>Species ~ 1</em>. El 1 hace referencia al <span class="math inline">\(\beta_0\)</span>, y se estima por defecto si no se indica explicitamente:</p>
-<div class="sourceCode" id="cb57"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb57-1" data-line-number="1">m22 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, d2)</a></code></pre></div>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb45-1" data-line-number="1">m3 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span><span class="dv">1</span>, d)</a></code></pre></div>
 <p>Por tanto</p>
-<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1"><span class="kw">anova</span>(m22, m2)</a></code></pre></div>
+<div class="sourceCode" id="cb46"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb46-1" data-line-number="1"><span class="kw">anova</span>(m3, m1)</a></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: Species ~ 1
@@ -2003,21 +1977,21 @@ H_1 : \text{Los modelos NO son iguales}
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 <div id="ejemplo-contraste-sobre-una-pareja-de-regresores" class="section level2">
-<h2><span class="header-section-number">4.3</span> Ejemplo: contraste sobre una pareja de regresores</h2>
+<h2><span class="header-section-number">5.3</span> Ejemplo: contraste sobre una pareja de regresores</h2>
 <p>El contraste que resolvemos es <span class="math inline">\(H_0 : \beta_{Area} = \beta_{Adjacent} = 0\)</span> en el modelo <em>Species ~ Area + Elevation + Nearest + Scruz + Adjacent</em>. Para ello lo comparamos con el modelo:</p>
-<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1">m23 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz, <span class="dt">data =</span> d2)</a>
-<a class="sourceLine" id="cb60-2" data-line-number="2">(<span class="dt">VNE23 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m23)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb48"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb48-1" data-line-number="1">m4 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb48-2" data-line-number="2">(<span class="dt">VNE4 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m4)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
 <pre><code>## [1] 158291.6</code></pre>
-<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE23 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>(VNE<span class="op">/</span><span class="dv">24</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb50"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb50-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE4 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span><span class="dv">2</span>)<span class="op">/</span>(VNE<span class="op">/</span><span class="dv">24</span>))</a></code></pre></div>
 <pre><code>## [1] 9.287352</code></pre>
-<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb64-1" data-line-number="1"><span class="co"># pvalor</span></a>
-<a class="sourceLine" id="cb64-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">24</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb52"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb52-1" data-line-number="1"><span class="co"># pvalor</span></a>
+<a class="sourceLine" id="cb52-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">2</span>, <span class="dv">24</span>)</a></code></pre></div>
 <pre><code>## [1] 0.001029711</code></pre>
 <p>Luego se rechaza la hipótesis nula.</p>
 <ul>
 <li>Con R:</li>
 </ul>
-<div class="sourceCode" id="cb66"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb66-1" data-line-number="1"><span class="kw">anova</span>(m23, m2)</a></code></pre></div>
+<div class="sourceCode" id="cb54"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb54-1" data-line-number="1"><span class="kw">anova</span>(m4, m1)</a></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: Species ~ Elevation + Nearest + Scruz
@@ -2029,20 +2003,20 @@ H_1 : \text{Los modelos NO son iguales}
 ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 <div id="ejemplo-contraste-de-igualdad-de-regresores" class="section level2">
-<h2><span class="header-section-number">4.4</span> Ejemplo: contraste de igualdad de regresores</h2>
+<h2><span class="header-section-number">5.4</span> Ejemplo: contraste de igualdad de regresores</h2>
 <p>El contraste que resolvemos es <span class="math inline">\(H_0 : \beta_{Area} = \beta_{Adjacent}\)</span> en el modelo <em>Species ~ Area + Elevation + Nearest + Scruz + Adjacent</em>. Hacemos la comparación con el modelo:</p>
-<div class="sourceCode" id="cb68"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb68-1" data-line-number="1">m24 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(Area <span class="op">+</span><span class="st"> </span>Adjacent) <span class="op">+</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz, <span class="dt">data =</span> d2)</a>
-<a class="sourceLine" id="cb68-2" data-line-number="2">(<span class="dt">VNE24 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m24)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb56"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb56-1" data-line-number="1">m5 =<span class="st"> </span><span class="kw">lm</span>(Species <span class="op">~</span><span class="st"> </span><span class="kw">I</span>(Area <span class="op">+</span><span class="st"> </span>Adjacent) <span class="op">+</span><span class="st"> </span>Elevation <span class="op">+</span><span class="st"> </span>Nearest <span class="op">+</span><span class="st"> </span>Scruz, <span class="dt">data =</span> d)</a>
+<a class="sourceLine" id="cb56-2" data-line-number="2">(<span class="dt">VNE5 =</span> <span class="kw">sum</span>(<span class="kw">resid</span>(m5)<span class="op">^</span><span class="dv">2</span>))</a></code></pre></div>
 <pre><code>## [1] 109591.1</code></pre>
-<div class="sourceCode" id="cb70"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb70-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE24 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span><span class="dv">1</span>)<span class="op">/</span>(VNE<span class="op">/</span><span class="dv">24</span>))</a></code></pre></div>
+<div class="sourceCode" id="cb58"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb58-1" data-line-number="1">(<span class="dt">F_0 =</span> ((VNE5 <span class="op">-</span><span class="st"> </span>VNE)<span class="op">/</span><span class="dv">1</span>)<span class="op">/</span>(VNE<span class="op">/</span><span class="dv">24</span>))</a></code></pre></div>
 <pre><code>## [1] 5.476035</code></pre>
-<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb72-1" data-line-number="1"><span class="co"># pvalor</span></a>
-<a class="sourceLine" id="cb72-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">24</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb60"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb60-1" data-line-number="1"><span class="co"># pvalor</span></a>
+<a class="sourceLine" id="cb60-2" data-line-number="2"><span class="dv">1</span><span class="op">-</span><span class="kw">pf</span>(F_<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">24</span>)</a></code></pre></div>
 <pre><code>## [1] 0.02792556</code></pre>
 <ul>
 <li>En R:</li>
 </ul>
-<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb74-1" data-line-number="1"><span class="kw">anova</span>(m24,m2)</a></code></pre></div>
+<div class="sourceCode" id="cb62"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb62-1" data-line-number="1"><span class="kw">anova</span>(m5,m1)</a></code></pre></div>
 <pre><code>## Analysis of Variance Table
 ## 
 ## Model 1: Species ~ I(Area + Adjacent) + Elevation + Nearest + Scruz

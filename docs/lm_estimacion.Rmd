@@ -1,5 +1,6 @@
 ---
 title: "Modelo matemático y su estimación"
+date: "`r format(Sys.time(), '%d %B %Y')`"
 output: 
   html_document:
     number_sections: true
@@ -15,28 +16,28 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Modelo
 
-Tenemos 4 vectores de datos de longitud *n*: 
+Tenemos un conjunto de datos organizados en la siguiente tabla: 
 
 \begin{equation}
 \begin{matrix}
-y & x_{1} & x_{2} & x_{3} \\
+y & x_{1} & x_{2} & \cdots & x_{k} \\
 \hline
-y_1 & x_{11} & x_{21} & x_{31} \\
-y_2 & x_{12} & x_{22} & x_{32} \\
-\cdots &\cdots & \cdots & \cdots \\
-y_n & x_{1n} & x_{2n} & x_{3n} \\
+y_1 & x_{11} & x_{21} & \cdots  & x_{k1} \\
+y_2 & x_{12} & x_{22} & \cdots  & x_{k2} \\
+\cdots &\cdots & \cdots & \cdots  & \cdots \\
+y_n & x_{1n} & x_{2n} & \cdots  & x_{kn} \\
 \end{matrix}
 \end{equation}
 
 El modelo que vamos a utilizar para analizar estos datos es el modelo lineal:
 
 \begin{equation}
-y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \epsilon_i, \ i = 1,2,\cdots,n
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \cdots + \beta_k x_{ki} + \epsilon_i, \ i = 1,2,\cdots,n
 \end{equation}
 
 - El término *y* se conoce como *variable respuesta*, y las *x* se conocen como *regresores*.
 - El término $\epsilon$ representa el error del modelo.
-- El término *lineal* se emplea porque la ecuación del modelo es una función lineal de los parámetros $\beta_0$, $\beta_1$, $\beta_2$ y $\beta_3$. 
+- El término *lineal* se emplea porque la ecuación del modelo es una función lineal de los parámetros $\beta_0$, $\beta_1$, $\beta_2$, $\beta_k$. 
 - Modelos en apariencia complicados pueden ser considerados como un modelo lineal. Por ejemplo:
 - polinomios:
 
@@ -65,11 +66,11 @@ y = \beta_0 + \beta_1 x^{\beta_2} + \epsilon
 La ecuación del modelo se suele escribir en notación matricial. Para ello escribimos la ecuación para todos los datos disponibles:
 
 \begin{equation}
-i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \beta_3 x_{31} + \epsilon_1
+i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \cdots + \beta_k x_{k1} + \epsilon_1
 \end{equation}
 
 \begin{equation}
-i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \beta_3 x_{32} + \epsilon_2
+i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \cdots  + \beta_k x_{k2} + \epsilon_2
 \end{equation}
 
 \begin{equation}
@@ -77,7 +78,7 @@ i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \beta_3 x_{3
 \end{equation}
 
 \begin{equation}
-i = n \Rightarrow y_n = \beta_0 + \beta_1 x_{1n} + \beta_2 x_{2n} + \beta_3 x_{3n} + \epsilon_n
+i = n \Rightarrow y_n = \beta_0 + \beta_1 x_{1n} + \beta_2 x_{2n} + \cdots  + \beta_k x_{kn} + \epsilon_n
 \end{equation}
 
 Agrupando:
@@ -88,13 +89,13 @@ y_1 \\ y_2 \\ \cdots \\ y_n
 \end{bmatrix}
 =
 \begin{bmatrix}
-1 & x_{11} & x_{21} & x_{31} \\
-1 & x_{12} & x_{22} & x_{32} \\
-\cdots &\cdots & \cdots & \cdots \\
-1 & x_{1n} & x_{2n} & x_{3n} \\
+1 & x_{11} & x_{21} & \cdots  & x_{k1} \\
+1 & x_{12} & x_{22} & \cdots  & x_{k2} \\
+\cdots &\cdots & \cdots & \cdots & \cdots \\
+1 & x_{1n} & x_{2n} & \cdots  & x_{kn} \\
 \end{bmatrix}
 \begin{bmatrix}
-\beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \cdots  \\ \beta_k
 \end{bmatrix}
 +
 \begin{bmatrix}
@@ -120,14 +121,14 @@ Se define el vector de parámetros estimados como:
 \hat \beta
 =
 \begin{bmatrix}
-\hat \beta_0 \\ \hat \beta_1 \\ \hat \beta_2 \\ \hat \beta_3
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \cdots  \\ \beta_k
 \end{bmatrix}
 \end{equation}
 
 La **respuesta estimada** por el modelo se calcula:
 
 \begin{equation}
-\hat y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}, \ i = 1,2,\cdots,n
+\hat y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \cdots + \hat \beta_k x_{ki}, \ i = 1,2,\cdots,n
 \end{equation}
 
 En forma matricial:
@@ -139,7 +140,7 @@ En forma matricial:
 Se definen los **residuos** como la diferencia entre la variable respuesta real y la estimada:
 
 \begin{equation}
-e_i = y_i - \hat y_i = y_i - (\hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}), \ i = 1,2,\cdots,n
+e_i = y_i - \hat y_i = y_i - (\hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \cdots  + \hat \beta_k x_{ki}), \ i = 1,2,\cdots,n
 \end{equation}
 
 En forma matricial:

@@ -7,7 +7,6 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
-<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -80,6 +79,8 @@ overflow: auto;
 margin-left: 2%;
 position: fixed;
 border: 1px solid #ccc;
+webkit-border-radius: 6px;
+moz-border-radius: 6px;
 border-radius: 6px;
 }
 
@@ -107,14 +108,9 @@ font-size: 12px;
 .tocify-subheader .tocify-subheader {
 text-indent: 30px;
 }
+
 .tocify-subheader .tocify-subheader .tocify-subheader {
 text-indent: 40px;
-}
-.tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader {
-text-indent: 50px;
-}
-.tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader .tocify-subheader {
-text-indent: 60px;
 }
 
 .tocify .tocify-item > a, .tocify .nav-list .nav-header {
@@ -518,13 +514,13 @@ float: none;
 
           item.append($("<a/>", {
 
-            "html": self.html()
+            "text": self.text()
 
           }));
 
         } else {
 
-          item.html(self.html());
+          item.text(self.text());
 
         }
 
@@ -1354,7 +1350,7 @@ code span.wa { color: #8f5902; font-weight: bold; font-style: italic; } /* Warni
       if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
       var style = rule.style.cssText;
       // check if color or background-color is set
-      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      if (rule.style.color === '' || rule.style.backgroundColor === '') continue;
       // replace div.sourceCode by a pre.sourceCode rule
       sheets[i].deleteRule(j);
       sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
@@ -1485,9 +1481,48 @@ summary {
 }
 </style>
 
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
 <!-- code folding -->
 
 
+
+<script>
+$(document).ready(function ()  {
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <style type="text/css">
 
@@ -1536,6 +1571,8 @@ div.tocify {
 
 .tocify-subheader .tocify-item {
   font-size: 0.90em;
+  padding-left: 25px;
+  text-indent: 0;
 }
 
 .tocify .list-group-item {
@@ -1572,31 +1609,32 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Modelo matemático y su estimación</h1>
+<h4 class="date">26 septiembre 2019</h4>
 
 </div>
 
 
 <div id="modelo" class="section level1">
 <h1><span class="header-section-number">1</span> Modelo</h1>
-<p>Tenemos 4 vectores de datos de longitud <em>n</em>:</p>
+<p>Tenemos un conjunto de datos organizados en la siguiente tabla:</p>
 <p><span class="math display">\[\begin{equation}
 \begin{matrix}
-y &amp; x_{1} &amp; x_{2} &amp; x_{3} \\
+y &amp; x_{1} &amp; x_{2} &amp; \cdots &amp; x_{k} \\
 \hline
-y_1 &amp; x_{11} &amp; x_{21} &amp; x_{31} \\
-y_2 &amp; x_{12} &amp; x_{22} &amp; x_{32} \\
-\cdots &amp;\cdots &amp; \cdots &amp; \cdots \\
-y_n &amp; x_{1n} &amp; x_{2n} &amp; x_{3n} \\
+y_1 &amp; x_{11} &amp; x_{21} &amp; \cdots  &amp; x_{k1} \\
+y_2 &amp; x_{12} &amp; x_{22} &amp; \cdots  &amp; x_{k2} \\
+\cdots &amp;\cdots &amp; \cdots &amp; \cdots  &amp; \cdots \\
+y_n &amp; x_{1n} &amp; x_{2n} &amp; \cdots  &amp; x_{kn} \\
 \end{matrix}
 \end{equation}\]</span></p>
 <p>El modelo que vamos a utilizar para analizar estos datos es el modelo lineal:</p>
 <p><span class="math display">\[\begin{equation}
-y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \beta_3 x_{3i} + \epsilon_i, \ i = 1,2,\cdots,n
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \cdots + \beta_k x_{ki} + \epsilon_i, \ i = 1,2,\cdots,n
 \end{equation}\]</span></p>
 <ul>
 <li>El término <em>y</em> se conoce como <em>variable respuesta</em>, y las <em>x</em> se conocen como <em>regresores</em>.</li>
 <li>El término <span class="math inline">\(\epsilon\)</span> representa el error del modelo.</li>
-<li>El término <em>lineal</em> se emplea porque la ecuación del modelo es una función lineal de los parámetros <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span> y <span class="math inline">\(\beta_3\)</span>.</li>
+<li>El término <em>lineal</em> se emplea porque la ecuación del modelo es una función lineal de los parámetros <span class="math inline">\(\beta_0\)</span>, <span class="math inline">\(\beta_1\)</span>, <span class="math inline">\(\beta_2\)</span>, <span class="math inline">\(\beta_k\)</span>.</li>
 <li>Modelos en apariencia complicados pueden ser considerados como un modelo lineal. Por ejemplo:</li>
 <li>polinomios:</li>
 </ul>
@@ -1623,16 +1661,16 @@ y = \beta_0 + \beta_1 x^{\beta_2} + \epsilon
 \end{equation}\]</span></p>
 <p>La ecuación del modelo se suele escribir en notación matricial. Para ello escribimos la ecuación para todos los datos disponibles:</p>
 <p><span class="math display">\[\begin{equation}
-i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \beta_3 x_{31} + \epsilon_1
+i = 1 \Rightarrow y_1 = \beta_0 + \beta_1 x_{11} + \beta_2 x_{21} + \cdots + \beta_k x_{k1} + \epsilon_1
 \end{equation}\]</span></p>
 <p><span class="math display">\[\begin{equation}
-i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \beta_3 x_{32} + \epsilon_2
+i = 2 \Rightarrow y_2 = \beta_0 + \beta_1 x_{12} + \beta_2 x_{22} + \cdots  + \beta_k x_{k2} + \epsilon_2
 \end{equation}\]</span></p>
 <p><span class="math display">\[\begin{equation}
 \cdots
 \end{equation}\]</span></p>
 <p><span class="math display">\[\begin{equation}
-i = n \Rightarrow y_n = \beta_0 + \beta_1 x_{1n} + \beta_2 x_{2n} + \beta_3 x_{3n} + \epsilon_n
+i = n \Rightarrow y_n = \beta_0 + \beta_1 x_{1n} + \beta_2 x_{2n} + \cdots  + \beta_k x_{kn} + \epsilon_n
 \end{equation}\]</span></p>
 <p>Agrupando:</p>
 <p><span class="math display">\[\begin{equation}
@@ -1641,13 +1679,13 @@ y_1 \\ y_2 \\ \cdots \\ y_n
 \end{bmatrix}
 =
 \begin{bmatrix}
-1 &amp; x_{11} &amp; x_{21} &amp; x_{31} \\
-1 &amp; x_{12} &amp; x_{22} &amp; x_{32} \\
-\cdots &amp;\cdots &amp; \cdots &amp; \cdots \\
-1 &amp; x_{1n} &amp; x_{2n} &amp; x_{3n} \\
+1 &amp; x_{11} &amp; x_{21} &amp; \cdots  &amp; x_{k1} \\
+1 &amp; x_{12} &amp; x_{22} &amp; \cdots  &amp; x_{k2} \\
+\cdots &amp;\cdots &amp; \cdots &amp; \cdots &amp; \cdots \\
+1 &amp; x_{1n} &amp; x_{2n} &amp; \cdots  &amp; x_{kn} \\
 \end{bmatrix}
 \begin{bmatrix}
-\beta_0 \\ \beta_1 \\ \beta_2 \\ \beta_3
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \cdots  \\ \beta_k
 \end{bmatrix}
 +
 \begin{bmatrix}
@@ -1669,12 +1707,12 @@ y = X \beta + \epsilon
 \hat \beta
 =
 \begin{bmatrix}
-\hat \beta_0 \\ \hat \beta_1 \\ \hat \beta_2 \\ \hat \beta_3
+\beta_0 \\ \beta_1 \\ \beta_2 \\ \cdots  \\ \beta_k
 \end{bmatrix}
 \end{equation}\]</span></p>
 <p>La <strong>respuesta estimada</strong> por el modelo se calcula:</p>
 <p><span class="math display">\[\begin{equation}
-\hat y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}, \ i = 1,2,\cdots,n
+\hat y_i = \hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \cdots + \hat \beta_k x_{ki}, \ i = 1,2,\cdots,n
 \end{equation}\]</span></p>
 <p>En forma matricial:</p>
 <p><span class="math display">\[\begin{equation}
@@ -1682,7 +1720,7 @@ y = X \beta + \epsilon
 \end{equation}\]</span></p>
 <p>Se definen los <strong>residuos</strong> como la diferencia entre la variable respuesta real y la estimada:</p>
 <p><span class="math display">\[\begin{equation}
-e_i = y_i - \hat y_i = y_i - (\hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \hat \beta_3 x_{3i}), \ i = 1,2,\cdots,n
+e_i = y_i - \hat y_i = y_i - (\hat \beta_0 + \hat \beta_1 x_{1i} + \hat \beta_2 x_{2i} + \cdots  + \hat \beta_k x_{ki}), \ i = 1,2,\cdots,n
 \end{equation}\]</span></p>
 <p>En forma matricial:</p>
 <p><span class="math display">\[\begin{equation}
@@ -1838,49 +1876,6 @@ $(document).ready(function () {
 });
 
 
-</script>
-
-<!-- tabsets -->
-
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
-<!-- code folding -->
-
-<script>
-$(document).ready(function ()  {
-
-    // move toc-ignore selectors from section div to header
-    $('div.section.toc-ignore')
-        .removeClass('toc-ignore')
-        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
-
-    // establish options
-    var options = {
-      selectors: "h1,h2,h3",
-      theme: "bootstrap3",
-      context: '.toc-content',
-      hashGenerator: function (text) {
-        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_').toLowerCase();
-      },
-      ignoreSelector: ".toc-ignore",
-      scrollTo: 0
-    };
-    options.showAndHide = true;
-    options.smoothScroll = true;
-
-    // tocify
-    var toc = $("#TOC").tocify(options).data("toc-tocify");
-});
 </script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
