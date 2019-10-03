@@ -1,0 +1,157 @@
+---
+title: "Aplicaciones del modelo de regresión lineal: relacción entre la variable respuesta y los regresores"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Aplicaciones de la regresión
+
+Podemos identificar dos aplicaciones básicas de los modelos de regresión:
+
+- Describir relaciones entre variables.
+- Predecir.
+
+# Datos 
+
+```{r}
+d = read.csv("datos/kidiq.csv")
+str(d)
+```
+
+Las variables son las siguientes:
+
+- **kid_score**: puntuacion de un test cognitivo en niños de 3-4 años
+- **mom_hs**:
+    - mom_hs = 1: las madres han terminado high school
+    - mom_hs = 0: las madres no terminaron high school
+- **mom_iq**: puntuación de la madre en un test IQ
+- **mom_work**:
+    - mom_work = 1: la madre no trabajó en los primeros tres años del niño
+    - mom_work = 2: la madre trabajó en el 2do o tercer año
+    - mom_work = 3: la madre trabajó a tiempo parcial el primer año
+    - mom_work = 4: la madre trabajó a tiempo completo el primer año
+- **mom_age**: edad de la madre
+
+Convertimos a factor las variables cualitativas:
+
+```{r}
+d$mom_hs = factor(d$mom_hs, labels = c("no","yes"))
+d$mom_work = factor(d$mom_work)
+```
+
+# Un regresor cualitativo
+
+Estimamos el modelo
+
+$$
+kid\_score_i = \beta_0 + \beta_1 mom\_hsyes_i + u_i
+$$
+
+donde *mom_hsyes* es una variable auxiliar con valores 0,1:
+
+- mom_hs = yes => mom_hsyes = 1
+- mom_hs = no => mom_hsyes = 0
+
+```{r}
+m1 = lm(kid_score ~ mom_hs, data = d)
+summary(m1)
+```
+
+```{r}
+plot(d$kid_score[d$mom_hs=="yes"], col = "blue", pch = 19, ylab = "kid score")
+points(d$kid_score[d$mom_hs=="no"], col = "red", pch = 19)
+```
+
+
+Tenemos dos modelos
+
+- mom_hsyes = 0:
+
+$$
+kid\_score_i = \hat \beta_0 + e_i
+$$
+
+Como los residuos siempre suman cero:
+
+$$
+\sum kid\_score_i = \sum \hat \beta_0 + \sum e_i \Rightarrow \frac{1}{n_1}\sum kid\_score_i = \hat \beta_0 
+$$
+
+Es decir, $\hat \beta_0$ es la media de las puntuaciones de los chicos cuyas madres no han terminado el bachillerato.
+
+```{r}
+# lo comprobamos en R
+mean(d$kid_score[d$mom_hs=="no"])
+```
+
+- mom_hsyes = 1:
+
+$$
+kid\_score_i = \hat \beta_0 + \hat \beta_1 mom\_hsyes_i + e_i
+$$
+
+Como los residuos suman cero:
+
+$$
+\sum kid\_score_i = \sum \hat \beta_0 + \sum \hat \beta_1 mom\_hsyes_i + \sum e_i \Rightarrow \frac{1}{n_2}\sum kid\_score_i = \hat \beta_0 + \hat \beta_1
+$$
+
+Luego $\hat \beta_0$ es la diferencia entre la media de las puntuaciones de los chicos cuya madre han terminado y las que no han terminado bachillerato.
+
+```{r}
+# en R
+mean(d$kid_score[d$mom_hs=="yes"]) - mean(d$kid_score[d$mom_hs=="no"])
+```
+
+Por tanto, elcontraste:
+
+$$
+H_0: \beta_1 = 0 \\
+H_1: \beta_1 \neq 0
+$$
+
+nos indica si dicha diferencia es estadísticamente significativa o no. Mirando el pvalor correspondiente, se rechaza H0, luego los hijos de madres con bachillerato tienen una puntuación mayor que los hijos de madres sin bachillerato (una puntuación 11.77 puntos superior en promedio).
+
+# Un regresor cuantitativo
+
+```{r}
+m2 = lm(kid_score ~ mom_iq, data = d)
+summary(m2)
+```
+
+- Interpretación de $\hat \beta_1$: mirando el pvalor vemos que es significativa. Se interpreta como el aumento (en promedio) de la puntuación cuando incrementamos en una unidad el IQ de las madres.
+- Interpretación de $\beta_0$: es significativo. Se interpreta como la puntuación que obtendría un chico cuya madre tiene IQ=0. En este caso, no tiene mucho sentido interpretar este parámetro.
+
+# Logaritmos y porcentajes
+
+```{r}
+m3 = lm(log(kid_score) ~ log(mom_iq), data = d)
+summary(m3)
+```
+
+# Un regresor cualitativo y otro cuantitativo
+
+## Sin interacción
+
+```{r}
+m4 = lm(kid_score ~ mom_iq + mom_hs, data = d)
+summary(m4)
+```
+
+- $\hat \beta_0$: puntuación de un chico cuya madre no ha terminado bachillerato y tiene un IQ=0
+- $\hat \beta_1$: si comparamos chicos con el mismo valor de *mom_hsyes*, un incremento de un punto en *mom_iq* conlleva un aumento de $\widehat{kid\_score}$
+- $\hat \beta_2$: para dos madres con el mismo IQ, una ternimó el bachillerato y la otra no, la puntuación de los chichos se diferencia en 5.95
+
+## Con interacción
+
+# Modelo con varios regresores

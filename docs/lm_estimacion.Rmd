@@ -109,7 +109,7 @@ Finalmente, en notación matricial:
 y = X \beta + \epsilon
 \end{equation}
 
-Esta ecuación es válida para cualquier número de regresore y cualquier númro de observaciones.
+Esta ecuación es válida para cualquier número de regresores y cualquier número de observaciones.
 
 # Estimación del modelo
 

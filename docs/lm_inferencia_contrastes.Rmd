@@ -290,13 +290,13 @@ Luego no se puede rechazar la hipótesis nula (los modelos son iguales), luego e
 anova(m2, m1)
 ```
 
-Es muy importante tener en cuenta la hipótesis nula que se está analizando. Es decir, si analizamos $\beta_{Area} = 0$ en el modelo *Species ~ Area*:
+Es muy importante tener en cuenta que la hipótesis nula que se está analizando depende del modelo utilizado. Es decir, si analizamos $\beta_{Area} = 0$ en el modelo *Species ~ Area*:
 
 ```{r}
 summary(lm(Species ~ Area, data = d))
 ```
 
-tenemos que el área de la isla si influye en el número de especies.
+tenemos que el área de la isla si influye en el número de especies. Sin embargo, cuando consideramos el modelo *Species ~ Area + Elevation + Nearest + Scruz + Adjacent*, el *Area* no es significativo porque su efecto se suma al de *Elevation*, *Nearest*,...
 
 ## Ejemplo: el contraste de regresión múltiple
 

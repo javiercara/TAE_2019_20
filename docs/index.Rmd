@@ -2,25 +2,53 @@
 title: "Técnicas Avanzadas de Estadística"
 author: "[Javier Cara](https://www.javiercara.com/)"
 date: "curso 2019-20"
-output: html_document
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
 ---
 
 <br>
 
-# __Contenido__
 ***
 
-## PARTE I: REGRESION LINEAL
+# Contenido
 
-1. [Modelo matemático y su estimación](lm_estimacion.html)
-2. [Estimación del modelo de regresión lineal con R](lm_estimacionR.html)
-3. [Regresión lineal con términos de interacción](lm_interaccion.html)
-4. [Fórmulas y expresiones en el modelo de regresión](lm_formulas.html)
-5. [Regresión lineal con variables cualitativas](lm_cualitativas.html)
-6. Inferencia en el modelo de regresión lineal
+## Regresión lineal
+
+1. Modelo de regresión lineal
+    a. [Modelo matemático y su estimación](lm_estimacion.html)
+    b. [Estimación del modelo de regresión lineal con R](lm_estimacionR.html)
+    c. [Regresión lineal con términos de interacción](lm_interaccion.html)
+    d. [Fórmulas y expresiones en el modelo de regresión](lm_formulas.html)
+    e. [Regresión lineal con variables cualitativas](lm_cualitativas.html)
+2. Inferencia en el modelo de regresión lineal
     a. [Distribuciones en el muestreo](lm_inferencia_muestreo.html)
     b. [Intervalos de confianza](lm_inferencia_intervalos.html)
     c. [Contrastes de hipótesis](lm_inferencia_contrastes.html)
     d. [Bootstrap](lm_inferencia_bootstrap.html)
+3. Aplicaciones
+    a. [Cálculo de predicciones](lm_aplicaciones_prediccion1.html)
+    b. [](lm_aplicaciones_explicacion.html)
+4. Diagnosis
+5. Selección de variables
     
+## Árboles de regresión y clasificación
+
+# Bibliografía
+
+Los libros utilizados en la redacción de estos apuntes han sido, fundamentalmente:
+
+- **[Faraway2014]** Linear models with R. Julian J. Faraway. Chapman and Hall/CRC. Edicion 2, 2014.
+- **[Gelman2007]** Data Analysis Using Regression and Multilevel/Hierarchical Models. Andrew Gelman, Jennifer Hill. Cambridge University Press. 2007.
+- **[James2017]** An Introduction to Statistical Learning: with Applications in R. Gareth James, Daniela Witten, Trevor Hastie and Rob Tibshirani. Springer, 2017.
+- **[Montgomery2013]** Introduction to Linear Regression Analysis. Douglas Montgomery, Elisabeth Peck, Geofrey Vining . Editorial Wiley-Blackwell, Edicion 5, 2013.
+- **[Peña2010]** Regresión y diseño de experimentos. Daniel Peña. Alianza Editorial, 2010.
+- **[Sheather2009]** A modern approach to regression with R. Simon J. Sheather. Springer tests in Statistics, 2009.
+
+# Archivos de datos
+
+- [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007]
+
 <br>

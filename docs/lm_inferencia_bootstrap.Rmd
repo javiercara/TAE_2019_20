@@ -15,125 +15,186 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 
-# Intervalo de confianza para las $\beta_i$
+# Datos
 
-Hemos visto que
-
-$$
-\hat \beta \rightarrow N(\beta, Q \sigma^2)
-$$
-
-donde $Q = (X^TX)^{-1}$. Esto implica que:
-
-$$
-\hat \beta_i \rightarrow N(\beta_i, Q_{ii} \sigma^2), \ i = 1,2, \ldots,k
-$$
-
-donde $Q_{ij}$ es el elemento *ij* de la matriz Q. Aplicando las propiedades de la distribución normal
-
-$$
-\frac{\hat \beta_i - \beta_i}{\sqrt{Q_{ii} \sigma^2}} \rightarrow N(0,1)
-$$
-
-Por tanto:
-
-$$
-\frac{\hat \beta_i - \beta_i}{se(\hat \beta_i)} \rightarrow t_{n-k-1}
-$$
-
-donde 
-
-$$se(\hat \beta_i) = \sqrt{Q_{ii} \hat s_R^2}$$
-
-Para deducir la expresión anterior se ha tenido en cuenta que
-
-$$
-\frac{N(0,1)}{\sqrt{\frac{\chi^2_n}{n}}} \rightarrow t_n
-$$
-
-Por tanto, el intervalo de confianza $100(1-\alpha)$% se escribe como
-
-$$
-\hat \beta_i \pm t_{n-k-1;\alpha/2} se(\hat \beta_i)
-$$
-
-# Intervalo de confianza para $\sigma^2$
-
-Partimos de la distribución en el muestreo:
-
-$$
-\frac{(n-k-1)\hat s_R^2}{\sigma^2} \rightarrow \chi^2_{n-k-1}
-$$
-
-Despejando:
-
-$$
-\frac{(n-k-1)\hat s_R^2}{\chi^2_{n-k-1;\alpha/2}} \leq \sigma^2 \leq \frac{(n-k-1)\hat s_R^2}{\chi^2_{n-k-1;1-\alpha/2}}
-$$
-
-# Ejemplo
+Supongamos que conocemos:
 
 ```{r}
-d = faraway::gala
-str(d)
+# y = a + bx + u, u ~ N(0,1)
+a = 2
+b = 0.5
+sigma = 1
+x = 1:20
 ```
+
+Podemos simular la variable y:
 
 ```{r}
-m = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+set.seed(2) # para obtener siempre los mismos resultados
+u = rnorm(20, 0, sigma)
+# datos
+y = a + b*x + u
+# dibujamos los datos obtenidos (x,y)
+plot(x,y, xlim = c(0,20), ylim = c(0,15), pch = 19)
+# añadimos la recta "teórica" entre x e y
+abline(a, b, lty = 2, lwd = 1, col = "red")
 ```
 
-En R podemos calcular la matriz de varianzas de los parámetros estimados, es decir $var(\hat \beta) = Q_{ii} \hat s_R^2$, mediante:
+
+# Precisión de los estimadores mediante probabilidad
+
+Ya hemos visto que 
+
+$$
+\hat \beta \sim N(\beta, (X^TX)^{-1} \sigma^2)
+$$
+
+Este resultado se deriva **matemáticamente** a partir de la distribución
+
+$$
+\epsilon \sim N(0, \sigma^2 I)
+$$
+
+Estimamos a y b utilizando x e y:
 
 ```{r}
-(beta_var = vcov(m))
+m = lm(y ~ x)
+(beta_e = coef(m))
 ```
 
-Por tanto, el standard error de los estimadores, $se(\hat \beta_i)$ será
+Podemos dibujar la recta *estimada* y la *teórica*:
 
 ```{r}
-(beta_se = sqrt(diag(beta_var)))
+plot(x,y, xlim = c(0,20), ylim = c(0,15), pch = 19)
+abline(a, b, lty = 2, lwd = 1, col = "red")
+abline(beta_e[1], beta_e[2], lwd = 1, col = "blue")
+legend(0, 15, legend=c("teorica", "estimada"), col=c("red", "blue"), lty=c(2,1))
 ```
 
-El valor de la t con n-k-1 = 30-5-1 = 24 grados de libertad es
+La varianza de los estimadores (o el standard error) es una manera de calcular su precisión:
 
 ```{r}
-(t1 = qt(1-0.05/2, df = 24))
+(beta_var = diag(vcov(m)))
 ```
 
-El límite inferior (LI) y el límite superior de los intervalos será:
-
-```{r}
-(LI = coef(m) - qt(1-0.05/2, df = 24)*beta_se)
-(LS = coef(m) + qt(1-0.05/2, df = 24)*beta_se)
-```
-
-Si lo juntamos todo en una tabla
-
-```{r}
-data.frame(estimacion = coef(m), se = beta_se, LI, LS)
-```
-
-Directamente, mediante la función *confint()* de R se pueden obtener dichos valores:
+Otra manera es mediante los intervalos de confianza:
 
 ```{r}
 confint(m)
 ```
 
-Si queremos otro nivel de confianza, por ejemplo, 90%:
+# Precisión de los estimadores mediante simulaciones
+
+Otra manera de obtener los resultados del apartado anterior es utilizando simulaciones en lugar de matemáticas. En este caso lo podemos hacer porque conocemos a, b y $\sigma$:
 
 ```{r}
-confint(m, level = 0.90)
+beta_e_sim = matrix(0, nrow = 500, ncol = 2)
+for (i in 1:500){
+  ui = rnorm(20, 0, sigma)
+  yi = a + b*x + ui
+  mi = lm(yi ~ x)
+  beta_e_sim[i,] = coef(mi)
+}
 ```
 
-- En el caso de la varianza del modelo. Su estimador es:
+Al final hemos obtenido 500 valores de $\hat a$ y $ \hat b$. Podemos dibujar el histograma:
 
 ```{r}
-(sR2 = sum(m$residuals^2)/24)
+par(mfrow = c(1,2))
+hist(beta_e_sim[,1], freq = F, xlab = "a estimada", main = "")
+hist(beta_e_sim[,1], freq = F, xlab = "b estimada", main = "")
 ```
 
-Y su intervalo de confianza:
+EL valor final que elegimos para $\hat a$ y $\hat b$ es la media de los datos:
 
 ```{r}
-c(24*sR2/qchisq(1-0.05/2, df = 24), 24*sR2/qchisq(0.05/2, df = 24))
+apply(beta_e_sim, 2, mean)
+```
+
+La varianza de los estimadores es la varianza de los datos correspondientes:
+
+```{r}
+apply(beta_e_sim, 2, var)
+```
+
+El intervalo de confianza se puede calcular a partir de los cuantiles de la distribución:
+
+```{r}
+apply(beta_e_sim, 2, quantile, probs = c(0.025,0.975))
+```
+
+# Precisión de los estimadores mediante bootstrap
+
+El problema con el método de simulaciones es que se tiene que conocer {a, b, $\sigma$}, y eso nunca ocurre. En la práctica solo se conoce {$x_i, y_i$}. Una alternativa es utilizar el método bootstrap:
+
+```{r}
+# residuos
+e = resid(m)
+# muestreamos los residuos CON REPOSICION
+beta_e_b = matrix(0, nrow = 500, ncol = 2)
+for (i in 1:500){
+  eb = sample(e, rep = T)
+  yb = beta_e[1] + beta_e[2]*x + eb
+  mb = lm(yb ~ x)
+  beta_e_b[i,] = coef(mb)
+}
+```
+
+Podemos calcular la varianza de los estimadores como:
+
+```{r}
+apply(beta_e_b, 2, var)
+```
+
+Y los intervalos de confianza:
+
+```{r}
+apply(beta_e_b, 2, quantile, probs = c(0.025,0.975))
+```
+
+El método bootstrap cobra importancia cuando la distribución en el muestreo teórica no se puede calcular matemáticamente.
+
+# Ejemplo
+
+Vamos a calcular la precisión de los parámetros del modelo siguiente utilizando probabilidad y bootstrap:
+
+```{r}
+d = faraway::gala
+m1 = lm(Species ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+beta_e = coef(m1)
+```
+
+```{r}
+# BOOTSTRAP
+# residuos
+e = resid(m1)
+# matrix de las X
+X = model.matrix(m1)
+# muestreamos los residuos CON REPOSICION
+beta_e_b = matrix(0, nrow = 500, ncol = 6)
+for (i in 1:500){
+  eb = sample(e, rep = T)
+  yb = X %*% beta_e + eb
+  mb = lm(yb ~ Area + Elevation + Nearest + Scruz + Adjacent, data = d)
+  beta_e_b[i,] = coef(mb)
+}
+```
+
+- Varianza de los parémetros estimados
+
+```{r}
+# con probabilidad
+diag(vcov(m1))
+# con bootstrap
+apply(beta_e_b, 2, var)
+```
+
+- intervalos de confianza
+
+```{r}
+# con probabilidad
+confint(m1)
+# con bootstrap
+t(apply(beta_e_b, 2, quantile, probs = c(0.025,0.975)))
 ```
 
