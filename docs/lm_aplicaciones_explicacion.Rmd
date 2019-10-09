@@ -14,13 +14,6 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Aplicaciones de la regresión
-
-Podemos identificar dos aplicaciones básicas de los modelos de regresión:
-
-- Describir relaciones entre variables.
-- Predecir.
-
 # Datos 
 
 ```{r}
@@ -67,12 +60,6 @@ m1 = lm(kid_score ~ mom_hs, data = d)
 summary(m1)
 ```
 
-```{r}
-plot(d$kid_score[d$mom_hs=="yes"], col = "blue", pch = 19, ylab = "kid score")
-points(d$kid_score[d$mom_hs=="no"], col = "red", pch = 19)
-```
-
-
 Tenemos dos modelos
 
 - mom_hsyes = 0:
@@ -113,7 +100,7 @@ Luego $\hat \beta_0$ es la diferencia entre la media de las puntuaciones de los 
 mean(d$kid_score[d$mom_hs=="yes"]) - mean(d$kid_score[d$mom_hs=="no"])
 ```
 
-Por tanto, elcontraste:
+Por tanto, el contraste:
 
 $$
 H_0: \beta_1 = 0 \\
@@ -121,6 +108,16 @@ H_1: \beta_1 \neq 0
 $$
 
 nos indica si dicha diferencia es estadísticamente significativa o no. Mirando el pvalor correspondiente, se rechaza H0, luego los hijos de madres con bachillerato tienen una puntuación mayor que los hijos de madres sin bachillerato (una puntuación 11.77 puntos superior en promedio).
+
+Gráficamente:
+
+```{r}
+plot(d$kid_score[d$mom_hs=="yes"], col = "blue", pch = 19, ylab = "kid score")
+points(d$kid_score[d$mom_hs=="no"], col = "red", pch = 19)
+abline(h=m1$coeff[1], col = "red")
+abline(h=m1$coeff[1]+m1$coef[2], col = "blue")
+legend(230,145, legend = c("mom_hs = yes","mom_hs = no"), col = c("blue","red"), lty = c(1,1))
+```
 
 # Un regresor cuantitativo
 
@@ -132,12 +129,34 @@ summary(m2)
 - Interpretación de $\hat \beta_1$: mirando el pvalor vemos que es significativa. Se interpreta como el aumento (en promedio) de la puntuación cuando incrementamos en una unidad el IQ de las madres.
 - Interpretación de $\beta_0$: es significativo. Se interpreta como la puntuación que obtendría un chico cuya madre tiene IQ=0. En este caso, no tiene mucho sentido interpretar este parámetro.
 
+Gráficamente:
+
+```{r}
+plot(d$mom_iq, d$kid_score, pch = 19, ylab = "kid score")
+abline(m2)
+```
+
+
 # Logaritmos y porcentajes
+
+$$
+\log(\hat y_i) = \hat \beta_0 + \hat \beta_1 \log(x_i)
+$$
+
+Tomando diferenciales:
+
+$$
+\frac{d \hat y_i}{\hat y_i} = \hat \beta_1 \frac{d x_i}{x_i} \Rightarrow \hat \beta_1 = \frac{\Delta \hat y_i / \hat y_i}{\Delta x_i / x_i}
+$$
+
+Es decir, un incremento del 1% de x produce un incremento del $\beta_1$% de y.
 
 ```{r}
 m3 = lm(log(kid_score) ~ log(mom_iq), data = d)
 summary(m3)
 ```
+
+Luego un incremento del 1% del IQ de las madres produce un incremento del $0.81$% de la puntuación de los hijos.
 
 # Un regresor cualitativo y otro cuantitativo
 
@@ -148,10 +167,98 @@ m4 = lm(kid_score ~ mom_iq + mom_hs, data = d)
 summary(m4)
 ```
 
+El modelo es:
+
+$$
+kid\_score_i = \hat \beta_0 + \hat \beta_1 mom\_iq_i + \hat \beta_2 mom\_hsyes_i + e_i
+$$
+
+Que en realidad son dos modelos con distinta ordenada en el origen y distinta pendiente:
+
+- Si mom_hsyes = 0:
+
+$$
+kid\_score_i = \hat \beta_0 + \hat \beta_1 mom\_iq_i + e_i
+$$
+
+- Si mom_hsyes = 1:
+
+$$
+kid\_score_i = (\hat \beta_0 + \hat \beta_2) +  \hat \beta_1 mom\_iq_i + e_i
+$$
+
+Por tanto:
+
 - $\hat \beta_0$: puntuación de un chico cuya madre no ha terminado bachillerato y tiene un IQ=0
 - $\hat \beta_1$: si comparamos chicos con el mismo valor de *mom_hsyes*, un incremento de un punto en *mom_iq* conlleva un aumento de $\widehat{kid\_score}$
 - $\hat \beta_2$: para dos madres con el mismo IQ, una ternimó el bachillerato y la otra no, la puntuación de los chichos se diferencia en 5.95
 
+Gráficamente:
+
+```{r}
+plot(d$mom_iq[d$mom_hs=="yes"], d$kid_score[d$mom_hs=="yes"], col = "blue", pch = 19, ylab = "kid score", ylim = c(30,160))
+points(d$mom_iq[d$mom_hs=="no"], d$kid_score[d$mom_hs=="no"], col = "red", pch = 19)
+abline(a = m4$coeff[1], b = m4$coeff[2], col = "red")
+abline(a = m4$coeff[1] + m4$coeff[3], b = m4$coeff[2], col = "blue")
+legend(70,160, legend = c("mom_hs = yes","mom_hs = no"), col = c("blue","red"), lty = c(1,1))
+```
+
 ## Con interacción
 
+```{r}
+m5 = lm(kid_score ~ mom_iq * mom_hs, data = d)
+summary(m5)
+```
+
+El modelo es:
+
+$$
+kid\_score_i = \hat \beta_0 + \hat \beta_1 mom\_iq_i + \hat \beta_2 mom\_hsyes_i + \hat \beta_3 mom\_hsyes_i * mom\_iq_i + e_i
+$$
+
+Que en realidad son dos modelos con distinta ordenada en el origen y distinta pendiente:
+
+- Si mom_hsyes = 0:
+
+$$
+kid\_score_i = \hat \beta_0 + \hat \beta_1 mom\_iq_i + e_i
+$$
+
+- Si mom_hsyes = 1:
+
+$$
+kid\_score_i = (\hat \beta_0 + \hat \beta_2) +  (\hat \beta_1 + \hat \beta_3) mom\_iq_i + e_i
+$$
+
+Por tanto:
+
+- La puntuación del test para chicos cuya madre no completó el bachillerato y tienen IQ = 0 es -11.48 en promedio. Mirando el pvalor, $\beta_0 = 0$.
+- La puntuación del test para los chicos cuya madre no completó el bachillerato aumenta 0.97 unidades cuando el IQ de la madre aumenta una unidad. Mirando el pvalor, $\beta_1 \neq 0$.
+- La puntuación del test para chicos cuya madre completó el bachillerato y tienen IQ = 0 es (-11.48 + 51.27). Mirando el pvalor, $\beta_2 \neq 0$, la ordenada en el origen no es la misma para ambos grupos.
+- La puntuación del test para los chicos cuya madre completó el bachillerato aumenta (0.97 - 0.48) unidades cuando el IQ de la madre aumenta una unidad. Mirando el pvalor, $\beta_3 \neq 0$, pendiente no es la misma para ambos grupos.
+
+Gráficamente:
+
+```{r}
+plot(d$mom_iq[d$mom_hs=="yes"], d$kid_score[d$mom_hs=="yes"], col = "blue", pch = 19, ylab = "kid score", ylim = c(30,160))
+points(d$mom_iq[d$mom_hs=="no"], d$kid_score[d$mom_hs=="no"], col = "red", pch = 19)
+abline(a = m5$coeff[1], b = m5$coeff[2], col = "red")
+abline(a = m5$coeff[1] + m5$coeff[3], b = m5$coeff[2] + m5$coeff[4], col = "blue")
+legend(70,160, legend = c("mom_hs = yes","mom_hs = no"), col = c("blue","red"), lty = c(1,1))
+```
+
 # Modelo con varios regresores
+
+```{r}
+m6 = lm(kid_score ~ mom_iq * mom_hs + mom_iq + mom_work, data = d)
+summary(m6)
+```
+
+$$
+score_i = \hat \beta_0 + \hat \beta_1 iq_i + \hat \beta_2 hsyes_i + \hat \beta_3 work2_i + \hat \beta_4 work3_i + \hat \beta_5 work4_i + \hat \beta_6 iq_i * hsyes_i + e_i
+$$
+
+
+
+
+

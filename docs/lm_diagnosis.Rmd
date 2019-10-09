@@ -1,0 +1,133 @@
+---
+title: "Aplicaciones del modelo de regresión lineal: cálculo de predicciones"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Hipótesis del modelo
+
+
+# Hipótesis sobre los errores del modelo
+
+Recordamos el modelo:
+
+$$
+y_i = \beta_0 + \beta_1 x_{1i} + \beta_2 x_{2i} + \cdots + \beta_k x_{ki} + u_i, \ i = 1,2,\cdots,n
+$$
+
+El modelo se basa en $u_i \sim N(0,\sigma^2)$, y pueden describirse como:
+
+- Normalidad
+- Varianza constante: todos los $u_i$ tienen la misma varianza.
+- Independepencia: $Cov[u_i,u_j] =  0 \ \forall i,j, \ i \neq j$
+
+Los errores no son observables (solo se observan las $y_i$), por lo que se trabaja con los residuos:
+
+$$
+e_i = y_i - \hat \beta_0 - \hat \beta_1 x_{1i} - \hat \beta_2 x_{2i} - \cdots - \hat \beta_k x_{ki} = y_i - \hat y_i
+$$
+
+
+En forma vectorial:
+
+$$
+e =y - \hat y = (I-H)y, \text{ dónde } H = X (X^TX)^{-1}X^T
+$$
+
+Sustituyendo el valor de y:
+
+$$
+e = (I - H)(X \beta + u) = (I - H)u
+$$
+ya que $HX = X$. Por tanto, los errores del modelo y los residuos no son intercambiables. De hecho:
+
+$$
+Var(e) = (I - H) \sigma^2
+$$
+
+Los errores $u_i$ tienen igual varianza y son independientes, pero según la ecuación anterior, esto no pasa con los residuos.
+
+## Varianza constante
+
+```{r}
+d = read.csv("datos/kidiq.csv")
+d$mom_hs = factor(d$mom_hs, labels = c("no","yes"))
+d$mom_work = factor(d$mom_work)
+m = lm(kid_score ~ mom_iq * mom_hs + mom_age + mom_work, data = d)
+summary(m)
+```
+
+```{r}
+par(mfrow=c(2,2))
+plot(m)
+```
+
+La herramienta más usada es el gráfico de residuos frente a valores predichos
+
+```{r}
+plot(fitted(m),residuals(m), xlab = "Valores predichos", ylab = "Residuos", ylim = c(-60,60))
+abline(h=0, lty = 2)
+```
+
+Los residuos se deben distribuir homogéneamente a un lado y otro del eje X. El problema más frecuente es que 
+
+## Comprobación de la normalidad
+
+La manera usual es comparar los cuantiles de los datos con los cuantiles teóricos
+
+- Cuantiles de los datos: son los datos ordenados, de menor a mayor.
+
+```{r}
+SampleQ = sort(residuals(m))
+```
+
+- Theoretical Quantiles: son los cuantiles de la N(0,1) correspondientes a $(i-0.5)/n$, donde *n* es el número de datos, $i=1,2,\cdots,n$.
+
+```{r}
+n = length(residuals(m))
+i = 1:n
+q = (i-0.5)/n
+TheoreticalQ = qnorm(q)
+```
+
+- Se representa TheoreticalQ *vs* sampleQ.
+
+```{r}
+plot(TheoreticalQ,SampleQ)
+```
+
+- Según la ayuda de R, *qqline()* pasa por el primer y tercer cuartil.
+
+```{r}
+plot(TheoreticalQ,SampleQ)
+
+# qqline
+x1 <- qnorm(0.25)
+x2 <- qnorm(0.75)
+y1 <- quantile(residuals(m), 0.25)
+y2 <- quantile(residuals(m), 0.75)
+# mas general
+b = (y2-y1)/(x2-x1) # pendiente
+a = y1 - b*x1 # y1 = a + b*x1
+abline(a,b, col = "blue", lwd = 1) # y = a + b*x
+```
+
+El test de normalidad de Shapiro:
+
+H0: los residuos tienen distribucion normal
+
+```{r}
+shapiro.test(resid(m))
+```
+

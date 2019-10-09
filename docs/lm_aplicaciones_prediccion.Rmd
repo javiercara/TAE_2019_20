@@ -14,6 +14,12 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+# Aplicaciones de la regresión
+
+Podemos identificar dos aplicaciones básicas de los modelos de regresión:
+
+- Predecir.
+- Describir relaciones entre variables.
 
 # Predicción del valor medio
 
@@ -215,6 +221,7 @@ points(xp1$mom_iq, yp1[3], col = "green", pch = 19) # limite superior int. pred.
 ## Predicción en un modelo de regresión múltiple
 
 Vamos a predecir:
+
 - mom_iq = 130
 - mon_hs = no
 - mom_age = 25
@@ -222,11 +229,12 @@ Vamos a predecir:
 
 ```{r}
 m2 = lm(kid_score ~ mom_iq + mom_hs + mom_age + mom_work, data = d)
+summary(m2)
 ```
 
 ### Prediccion del valor medio
 
-Recordamos que el modelo sería: kid_score ~ mom_iq + mom_hs_NO + mon_age + mom_work_2 + mom_work_3 + mom_work_4
+Recordamos que el modelo sería: $kid\_score = \hat \beta_0 + \hat \beta_1 mom\_iq + \hat \beta_2 mom\_hsyes + \hat \beta_3 mon\_age + \hat \beta_4 mom\_work2 + \hat \beta_5 mom\_work3 + \hat \beta_6 mom\_work4 + e$
 
 ```{r}
 xp = matrix(c(1, 130, 0, 25, 0, 1, 0), ncol = 1)
@@ -261,9 +269,9 @@ xp1 = data.frame(mom_iq = 130, mom_hs = "no", mom_age = 25, mom_work = "3")
 
 # Predicciones utilizando bootstrap
 
-## Predicción del valor medio
+## Intervalo de confianza para el valor medio
 
-Vamos a calcular el intervalo deconfianza utilizando bootstrap:
+Vamos a calcular el intervalo de confianza utilizando bootstrap:
 
 ```{r}
 B = 1000
@@ -277,12 +285,9 @@ for (b in 1:B){
 }
 ```
 
-Resultados:
+El intervalo de confianza para el valor medio es:
 
 ```{r}
-# prediccion puntual
-mean(yp_medio_b)
-# intervalo de predicccion
 quantile(yp_medio_b, probs = c(0.025, 0.975))
 ```
 
