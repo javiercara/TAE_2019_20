@@ -1609,7 +1609,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Aplicaciones del modelo de regresión lineal: cálculo de predicciones</h1>
-<h4 class="date">09 octubre 2019</h4>
+<h4 class="date">10 octubre 2019</h4>
 
 </div>
 
@@ -1874,23 +1874,28 @@ P \left( x_p^T \hat \beta - t_{\alpha/2} \hat s_R\sqrt{1 + x_p^T (X^TX)^{-1} x_p
 <p>El intervalo de confianza para el valor medio es:</p>
 <div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb30-1" data-line-number="1"><span class="kw">quantile</span>(yp_medio_b, <span class="dt">probs =</span> <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</a></code></pre></div>
 <pre><code>##      2.5%     97.5% 
-##  95.86771 110.04291</code></pre>
+##  95.75576 110.07076</code></pre>
 </div>
 <div id="intervalo-de-prediccion-1" class="section level2">
 <h2><span class="header-section-number">5.2</span> Intervalo de predicción</h2>
-<p>Vamos a calcular el intervalo de predicción utilizando bootstrap:</p>
+<p>Vamos a calcular el intervalo de predicción utilizando bootstrap. Vamos a utilizar la fórmula:</p>
+<p><span class="math display">\[
+e_p = y_p - \hat y_p \Rightarrow y_p = \hat y_p + e_p 
+\]</span></p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb32-1" data-line-number="1">yp_b =<span class="st"> </span><span class="kw">rep</span>(<span class="dv">0</span>,B)</a>
 <a class="sourceLine" id="cb32-2" data-line-number="2">e =<span class="st"> </span><span class="kw">resid</span>(m2)</a>
-<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="co"># hacemos que los residuos tengan la varianza teorica (e/sR)*sqrt(sR2*(1+mat))</span></a>
-<a class="sourceLine" id="cb32-4" data-line-number="4">e1 =<span class="st"> </span>e <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>mat[<span class="dv">1</span>,<span class="dv">1</span>])</a>
-<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>B){</a>
-<a class="sourceLine" id="cb32-6" data-line-number="6">  yp_b[b] =<span class="st"> </span>yp_medio_b[b] <span class="op">+</span><span class="st"> </span><span class="kw">sample</span>(e1, <span class="dv">1</span>)</a>
-<a class="sourceLine" id="cb32-7" data-line-number="7">}</a></code></pre></div>
+<a class="sourceLine" id="cb32-3" data-line-number="3"><span class="co"># los residuos de lm() tienen varianza igual a la varianza residual</span></a>
+<a class="sourceLine" id="cb32-4" data-line-number="4"><span class="co"># pero los errores de predicción tienen varianza sR2*(1+mat)</span></a>
+<a class="sourceLine" id="cb32-5" data-line-number="5"><span class="co"># hacemos que los errores de prediccion tengan la varianza teorica (e/sR)*sqrt(sR2*(1+mat))</span></a>
+<a class="sourceLine" id="cb32-6" data-line-number="6">e1 =<span class="st"> </span>e <span class="op">*</span><span class="st"> </span><span class="kw">sqrt</span>(<span class="dv">1</span> <span class="op">+</span><span class="st"> </span>mat[<span class="dv">1</span>,<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb32-7" data-line-number="7"><span class="cf">for</span> (b <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span>B){</a>
+<a class="sourceLine" id="cb32-8" data-line-number="8">  yp_b[b] =<span class="st"> </span>yp_medio_b[b] <span class="op">+</span><span class="st"> </span><span class="kw">sample</span>(e1, <span class="dv">1</span>)</a>
+<a class="sourceLine" id="cb32-9" data-line-number="9">}</a></code></pre></div>
 <p>Resultados:</p>
 <div class="sourceCode" id="cb33"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb33-1" data-line-number="1"><span class="co"># intervalo de predicccion</span></a>
 <a class="sourceLine" id="cb33-2" data-line-number="2"><span class="kw">quantile</span>(yp_b, <span class="dt">probs =</span> <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>))</a></code></pre></div>
 <pre><code>##      2.5%     97.5% 
-##  66.01335 137.22538</code></pre>
+##  65.44265 137.32346</code></pre>
 </div>
 </div>
 

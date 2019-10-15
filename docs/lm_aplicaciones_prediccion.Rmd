@@ -293,12 +293,18 @@ quantile(yp_medio_b, probs = c(0.025, 0.975))
 
 ## Intervalo de predicción
 
-Vamos a calcular el intervalo de predicción utilizando bootstrap:
+Vamos a calcular el intervalo de predicción utilizando bootstrap. Vamos a utilizar la fórmula:
+
+$$
+e_p = y_p - \hat y_p \Rightarrow y_p = \hat y_p + e_p 
+$$
 
 ```{r}
 yp_b = rep(0,B)
 e = resid(m2)
-# hacemos que los residuos tengan la varianza teorica (e/sR)*sqrt(sR2*(1+mat))
+# los residuos de lm() tienen varianza igual a la varianza residual
+# pero los errores de predicción tienen varianza sR2*(1+mat)
+# hacemos que los errores de prediccion tengan la varianza teorica (e/sR)*sqrt(sR2*(1+mat))
 e1 = e * sqrt(1 + mat[1,1])
 for (b in 1:B){
   yp_b[b] = yp_medio_b[b] + sample(e1, 1)

@@ -28,11 +28,17 @@ output:
     b. [Intervalos de confianza](lm_inferencia_intervalos.html)
     c. [Contrastes de hipótesis](lm_inferencia_contrastes.html)
     d. [Bootstrap](lm_inferencia_bootstrap.html)
-3. Aplicaciones
+3. Aplicaciones del modelo de regresión lineal
     a. [Cálculo de predicciones](lm_aplicaciones_prediccion.html)
     b. [Explicación de las relaciones entre variables](lm_aplicaciones_explicacion.html)
 4. Diagnosis
-5. Selección de variables
+    a. [Análisis de los residuos del modelo](lm_problemas_diagnosis.html)
+5. Ejemplo
+    a. [Ejemplo](lm_ejemplo1.html)
+6. Regresores especiales
+7. Selección de variables
+8. Multicolinealidad
+9. Regresión con series temporales
     
 ## Árboles de regresión y clasificación
 
@@ -49,6 +55,8 @@ Los libros utilizados en la redacción de estos apuntes han sido, fundamentalmen
 
 # Archivos de datos
 
-- [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007]
+- [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007].
+- [cerezos.txt](datos/cerezos.txt)
+- [Advertising.csv](datos/Advertising.csv). Mas información en [James2017].
 
 <br>
