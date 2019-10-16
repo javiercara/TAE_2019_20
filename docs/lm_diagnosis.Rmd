@@ -39,10 +39,10 @@ $$
 En forma vectorial:
 
 $$
-e =y - \hat y = (I-H)y, \text{ dónde } H = X (X^TX)^{-1}X^T
+e =y - \hat y = (I-H)y
 $$
 
-ya que $\hat y = X \hat \beta = X (X^T X)^{-1} X^T y = H y$. Sustituyendo el valor de y:
+ya que $\hat y = X \hat \beta = X (X^T X)^{-1} X^T y = H y$, donde $H = X (X^TX)^{-1}X^T$. Sustituyendo el valor de y:
 
 $$
 e = (I - H)(X \beta + u) = (I - H)u
@@ -59,7 +59,7 @@ $$
 Var(e) = \sigma^2 (I - H)
 $$
 
-ya que la matriz H es idempotente ($H H^T = I$). La varianza de cada residuo viene dada por:
+ya que la matriz H es simétrica ($H = H^T$) e idempotente ($H \cdot H = H$). La varianza de cada residuo viene dada por:
 
 $$
 Var(e_i) = \sigma^2(1 - h_{ii}), \quad i = 1,\ldots,n

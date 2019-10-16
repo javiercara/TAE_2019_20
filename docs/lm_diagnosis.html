@@ -1609,7 +1609,7 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Comprobación de las hipótesis del modelo: diagnosis</h1>
-<h4 class="date">15 octubre 2019</h4>
+<h4 class="date">16 octubre 2019</h4>
 
 </div>
 
@@ -1632,9 +1632,9 @@ e_i = y_i - \hat \beta_0 - \hat \beta_1 x_{1i} - \hat \beta_2 x_{2i} - \cdots - 
 \]</span></p>
 <p>En forma vectorial:</p>
 <p><span class="math display">\[
-e =y - \hat y = (I-H)y, \text{ dónde } H = X (X^TX)^{-1}X^T
+e =y - \hat y = (I-H)y
 \]</span></p>
-<p>ya que <span class="math inline">\(\hat y = X \hat \beta = X (X^T X)^{-1} X^T y = H y\)</span>. Sustituyendo el valor de y:</p>
+<p>ya que <span class="math inline">\(\hat y = X \hat \beta = X (X^T X)^{-1} X^T y = H y\)</span>, donde <span class="math inline">\(H = X (X^TX)^{-1}X^T\)</span>. Sustituyendo el valor de y:</p>
 <p><span class="math display">\[
 e = (I - H)(X \beta + u) = (I - H)u
 \]</span> ya que <span class="math inline">\(HX = X\)</span>. Por tanto, los errores del modelo y los residuos no son intercambiables, sino que los residuos son una combinación lineal de los errores.</p>
@@ -1645,7 +1645,7 @@ E[e] = 0
 <p><span class="math display">\[
 Var(e) = \sigma^2 (I - H)
 \]</span></p>
-<p>ya que la matriz H es idempotente (<span class="math inline">\(H H^T = I\)</span>). La varianza de cada residuo viene dada por:</p>
+<p>ya que la matriz H es simétrica (<span class="math inline">\(H = H^T\)</span>) e idempotente (<span class="math inline">\(H \cdot H = H\)</span>). La varianza de cada residuo viene dada por:</p>
 <p><span class="math display">\[
 Var(e_i) = \sigma^2(1 - h_{ii}), \quad i = 1,\ldots,n
 \]</span></p>
