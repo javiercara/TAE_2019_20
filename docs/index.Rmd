@@ -62,9 +62,18 @@ Los libros utilizados en la redacción de estos apuntes han sido, fundamentalmen
 
 # Archivos de datos
 
-- [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007].
-- [cerezos.txt](datos/cerezos.txt)
 - [Advertising.csv](datos/Advertising.csv). Mas información en [James2017].
+- [cerezos.txt](datos/cerezos.txt)
+- [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007].
+- [Hitters.csv](datos/Hitters.csv). Mas información en [James2017].
 - [Wage.csv](datos/Wage.csv). Mas información en [James2017].
+
+# Funciones
+
+- [cross_val_pos()](funciones/cross_val_pos.R).
+- [MSE()](funciones/MSE.R)
+- [predict.regsubsets()](funciones/regsubsets_predict.R).
+
+
 
 <br>
