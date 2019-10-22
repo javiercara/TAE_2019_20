@@ -35,8 +35,15 @@ output:
     a. [Análisis de los residuos del modelo](lm_diagnosis.html)
 5. Ejemplo
     a. [Ejemplo](lm_ejemplo1.html)
-6. Regresores especiales
-7. Selección de variables
+6. Extensiones del modelo lineal
+    a. [Regresores polinómicos](lm_extensiones_polinomios.html)
+    b. [Splines de regresión](lm_extensiones_splines.html)
+    c. [Modelos aditivos](lm_extensiones_modelosAditivos.html)
+    d. [Regresión local](lm_extensiones_regresionLocal.html) (No entra en el examen)
+7. Validación cruzada.
+    a. [Validación cruzada](lm_validacion_cruzada.html)
+8. Selección de variables
+    a. [Selección de variables](lm_seleccion_variables.html)
 8. Multicolinealidad
 9. Regresión con series temporales
     
@@ -58,5 +65,6 @@ Los libros utilizados en la redacción de estos apuntes han sido, fundamentalmen
 - [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007].
 - [cerezos.txt](datos/cerezos.txt)
 - [Advertising.csv](datos/Advertising.csv). Mas información en [James2017].
+- [Wage.csv](datos/Wage.csv). Mas información en [James2017].
 
 <br>
