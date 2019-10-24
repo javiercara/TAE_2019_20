@@ -1,0 +1,65 @@
+---
+title: "Introducción a los árboles de clasificiación y regresión"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output: 
+  html_document:
+    number_sections: true
+    toc: true
+    toc_float: true
+    theme: readable
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Arbol con UN regresor
+
+
+```{r cars}
+library(tree)
+
+datos = read.table('datos/coches.txt',header=T)
+```
+
+```{r}
+t1 = tree(consumo~cv,data=datos)
+plot(t1)
+text(t1,pretty=0)
+```
+
+```{r}
+plot(datos$cv,datos$consumo,xlab="CV",ylab="Consumo")
+partition.tree(tree=t1, add = TRUE, col = "red", lwd = 3)
+```
+
+# Arbol con DOS regresores
+
+```{r}
+t2 = tree(consumo ~ cv + peso,data=datos)
+plot(t2)
+text(t2,pretty=0)
+```
+
+```{r}
+plot(datos$cv, datos$peso, xlab="CV", ylab="Peso")
+partition.tree(tree=t2, label = "Consumo", add = TRUE, ordvars = c("cv","peso"), col = "blue")
+```
+
+# Graficos mas bonitos con rpart
+
+```{r}
+library(rpart)
+library(rpart.plot)
+
+t11 <- rpart(consumo ~ cv + peso, data = datos, method = "anova")
+rpart.plot(x = t11, yesno = 2, extra = 0, digits = 3)
+```
+
+
+
+
+
+
+

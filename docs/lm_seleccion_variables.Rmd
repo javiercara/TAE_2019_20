@@ -145,7 +145,7 @@ which.max(m_best_summary$adjr2)
 Si utilizamos el criterio del Cp (que es equivalente al AIC):
 
 ```{r}
-plot(m_best_summary$cp, xlab = "Numero de variables", ylab = "R2 ajustado", type = "b")
+plot(m_best_summary$cp, xlab = "Numero de variables", ylab = "Cp", type = "b")
 ```
 
 ```{r}

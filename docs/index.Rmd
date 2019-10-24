@@ -44,10 +44,16 @@ output:
     a. [Validación cruzada](lm_validacion_cruzada.html)
 8. Selección de variables
     a. [Selección de variables](lm_seleccion_variables.html)
-8. Multicolinealidad
-9. Regresión con series temporales
     
 ## Árboles de regresión y clasificación
+
+1. Árboles de regresión
+    a. [Introducción](tree_intro.html)
+    b. [Estimación](tree_regresion.html)
+    c. [Random Forest](tree_RandomForest.html)
+    d. [boosting](tree_boosting.html)
+2. Árboles de clasificación
+
 
 # Bibliografía
 
@@ -64,6 +70,7 @@ Los libros utilizados en la redacción de estos apuntes han sido, fundamentalmen
 
 - [Advertising.csv](datos/Advertising.csv). Mas información en [James2017].
 - [cerezos.txt](datos/cerezos.txt)
+- [coches.txt](datos/coches.txt)
 - [kidiq.csv](datos/kidiq.csv). Mas información en [Gelman2007].
 - [Hitters.csv](datos/Hitters.csv). Mas información en [James2017].
 - [Wage.csv](datos/Wage.csv). Mas información en [James2017].
