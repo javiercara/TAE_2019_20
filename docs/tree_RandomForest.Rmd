@@ -14,9 +14,9 @@ output:
 
 ```{r cars}
 library(tree)
-datos = read.table('datos/coches.txt',header=T)
-datos = na.omit(datos)
-datos$origen = factor(datos$origen, labels = c("USA","Europa","Japon"))
+d = read.table('datos/coches.txt',header=T)
+d = na.omit(d)
+d$origen = factor(d$origen, labels = c("USA","Europa","Japon"))
 ```
 
 # Training set *vs* Test set
@@ -25,10 +25,10 @@ Dividimos los datos en dos partes, una para entrenar el modelo y otra para calcu
 
 ```{r}
 set.seed(321)
-ndat = nrow(datos)
-train = sample(1:ndat,ndat/2) # la mitad de los datos para entranamiento
-datos_train = datos[train,] # trainning set
-datos_test = datos[-train,] # test set
+ndat = nrow(d)
+pos_train = sample(1:ndat,ndat/2) # la mitad de los datos para entranamiento
+datos_train = d[pos_train,] # trainning set
+datos_test = d[-pos_train,] # test set
 ```
 
 # Random Forest
@@ -44,74 +44,98 @@ $$
 
 - La gran ventaja de random forest frente a bagging es que funciona muy bien con datos que tienen variables correlacionadas.
 
-## mtry = 3
+## mtry = 7 (**BAGGING**)
 
 ```{r}
 library(randomForest)
 # numero total de regresores: 7
-rf1 = randomForest(consumo ~ ., data = datos_train, mtry=3, ntree = 500)
+rf1 = randomForest(consumo ~ ., data = datos_train, mtry = 7, ntree = 500)
 ```
 
 Error del modelo:
 
 ```{r}
 yp_train_rf1 <- predict(rf1, newdata = datos_train)
-
-y_train = datos_train$consumo
-( MSE_train_rf1 = mean((y_train - yp_train_rf1)^2) ) # error cuadratico medio en los datos de training
+y_train = datos_train$consumo 
+# error cuadratico medio en los datos de training
+( MSE_train_rf1 = mean((y_train - yp_train_rf1)^2) )
 ```
 
 Error de predicción:
 
 ```{r}
-# prediccion del consumo con los datos de validacion
+# prediccion del consumo con los datos test
 yp_test_rf1 = predict(rf1, newdata = datos_test)
 
-# error del validation set
+# error del test set
 y_test = datos_test$consumo
 (MSE_test_rf1 = mean((y_test - yp_test_rf1)^2))
 ```
 
-## mtry = 5
+## mtry = 3
 
 ```{r}
-rf2 = randomForest(consumo ~ ., data = datos_train, mtry=5, ntree = 500)
+rf2 = randomForest(consumo ~ ., data = datos_train, mtry = 3, ntree = 500)
 ```
 
 Error del modelo:
 
 ```{r}
 yp_train_rf2 <- predict(rf2, newdata = datos_train)
-( MSE_train_rf2 = mean((y_train - yp_train_rf2)^2) ) # error cuadratico medio en los datos de training
+# error cuadratico medio en los datos de training
+( MSE_train_rf2 = mean((y_train - yp_train_rf2)^2) )
 ```
 
 Error de predicción:
 
 ```{r}
-# prediccion del consumo con los datos de validacion
+# prediccion del consumo con los datos test
 yp_test_rf2 = predict(rf2, newdata = datos_test)
-
-# error del validation set
+# error del test set
 (MSE_test_rf2 = mean((y_test - yp_test_rf2)^2))
+```
+
+## mtry = 5
+
+```{r}
+rf3 = randomForest(consumo ~ ., data = datos_train, mtry = 5, ntree = 500)
+```
+
+Error del modelo:
+
+```{r}
+yp_train_rf3 <- predict(rf3, newdata = datos_train)
+# error cuadratico medio en los datos de training
+( MSE_train_rf3 = mean((y_train - yp_train_rf3)^2) ) 
+```
+
+Error de predicción:
+
+```{r}
+# prediccion del consumo con los datos test
+yp_test_rf3 = predict(rf3, newdata = datos_test)
+
+# error del test set
+(MSE_test_rf3 = mean((y_test - yp_test_rf3)^2))
 ```
 
 
 # Importancia de variables
 
 ```{r}
-rf3 = randomForest(consumo ~ ., data = datos_train, mtry=5, ntree = 500, importance = T)
+rf4 = randomForest(consumo ~ ., data = datos_train, mtry = 5, ntree = 500, importance = T)
 ```
 
 ```{r}
-importance(rf3)
+importance(rf4)
 ```
 
-- %IncMSE: descenso de la calidad de las predicciones realizadas en los datos *out of samples* cuando cada variable es excluida en la partición del nodo.
+- %IncMSE: descenso de la calidad de las predicciones realizadas en los datos *out of samples* cuando los valores de una variable dada se permutan aleatoriamente (sería como quitarla del modelo).
 
 - IncNodePurity: suma del descenso acumulado del RSS al partir por dicha variable.
 
 ```{r}
-varImpPlot(rf3)
+varImpPlot(rf4)
 ```
 
 

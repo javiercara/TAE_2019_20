@@ -48,7 +48,7 @@ output:
 ## Árboles de regresión y clasificación
 
 1. Árboles de regresión
-    a. [Introducción](tree_intro.html)
+    a. Introducción
     b. [Estimación](tree_regresion.html)
     c. [Random Forest](tree_RandomForest.html)
     d. [boosting](tree_boosting.html)

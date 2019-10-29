@@ -12,25 +12,27 @@ output:
 
 # Estimación de los árboles de regresión
 
+## La función rpart
+
 ```{r cars}
-library(tree)
-datos = read.table('datos/coches.txt',header=T)
+library(rpart)
+d = read.table('datos/coches.txt', header = T)
+d = na.omit(d)
+d$origen = factor(d$origen, labels = c("USA","Europa","Japon"))
 ```
 
 ```{r}
-t1 = tree(consumo ~ .,data=datos)
+# method = "anova" para modelos de regresion
+t1 = rpart(consumo ~ ., data = d, method = "anova")
 ```
 
 ```{r}
-plot(t1)
+plot(t1, margin = 0.02)
 text(t1, cex = 0.75)
 ```
 
-```{r}
-summary(t1)
-```
 
-Los regresores que son influyentes en el consumo son los que se han empleado en las particiones.
+- Los regresores que son influyentes en el consumo son los que se han empleado en las particiones.
 
 ```{r}
 print(t1)
@@ -44,99 +46,147 @@ Lo que devuelve la tabla es:
 - deviance: = RSS = $\sum(y_i - \hat{y}_i)^2$.
 
 ```{r}
-n = nrow(datos)
-( deviance_root = sum( (datos$consumo - mean(datos$consumo))^2 ) )
+n = nrow(d)
+( deviance_root = sum( (d$consumo - mean(d$consumo))^2 ) )
 ```
 
 - yval: predicción del nodo = $\bar{y}$
 
 ```{r}
-mean(datos$consumo)
+mean(d$consumo)
 ```
 
 - un asterisco * para indicar un nodo terminal u hoja.
 
-# Parámetros del árbol
+## Parámetros del árbol
 
 ```{r}
-t2 = tree(consumo ~ .,data=datos, control = tree.control(nobs=nrow(datos),mincut = 20,minsize = 40,mindev = 0.05))
-plot(t2)
+t2 = rpart(consumo ~ ., data = d, method = "anova",
+    control = rpart.control(minsplit = 10, minbucket = 5, cp = 0.05))
+plot(t2, margin = 0.02)
 text(t2, cex=.75)
 ```
 
 control:
 
-- minsize: tamaño mínimo del nodo para que se divida en dos (por defecto, minsize = 10).
-- mincut: si al dividir un nodo, uno de los nodos hijo tiene un tamaño inferior a éste, no se divide el nodo (por defecto, mincut = 5). Ojo, mincut ha de ser menor que minsize/2.
-- mindev: para que un nodo se divida, la deviance del nodo tiene que ser mayor que mindev por la deviance del nodo raiz.
+- minsplit: número mínimo de observaciones del nodo para que se divida en dos (por defecto, minsplit = 20).
+- minbucket: número mínimo de observaciones en un nodo terminal u hoja (por defecto, minbucket = minsplit/3).
+- maxdev: se fija el nivel máximo de cualquier nodo del árbol, siendo 0 el nivel del nodo raiz.
+- cp: complexity parameter. En árboles de regresión, para que un nodo se divida, el R2 tiene que incrementarse en más de cp (por defecto, cp = 0.01). En este caso: [RSS(padre) - RSS(hijo1) - RSS(hijo2)]/RSS(raiz) > cp
+- xval: número de validaciones cruzadas. Se utiliza para el podado.
 
 ```{r}
 print(t2)
 ```
 
-- si queremos obtener un árbol que se ajusta perféctamente a los datos hay que utilizar  mindev = 0 y minsize = 2. Estos árboles predicen muy mal porque son muy sensibles a ligeros cambios en los datos.
+- Como vemos, en este caso el criterio que detiene el crecimiento del árbol es cp. Por ejemplo, el nodo 3 se ha dividido ya que 
 
 ```{r}
-t3 = tree(consumo ~ ., data=datos, control = tree.control(nobs=nrow(datos),minsize = 2,mindev = 0.0))
-plot(t3)
-#text(t3, cex=.75)
+(1358.94 - 358.01 - 399.94)/5910.74
 ```
+
+- que es mayor que el límite cp = 0.05.
+
+- Podemos construir un arbol más *profundo*:
+
+```{r}
+t3 = rpart(consumo ~ ., data = d, method = "anova",
+    control = rpart.control(minsplit = 10, minbucket = 5, cp = 0.01))
+plot(t3, margin = 0.02)
+text(t3, cex=.75)
+```
+
+```{r}
+print(t3)
+```
+
+- vemos que el nodo 7 en t2 no se dividía pero en t3 si se divide ya que:
+
+```{r}
+(399.94 - 132.80 - 157.17)/5910.74
+```
+
+- De nuevo cp es el parámetro más restrictivo.
+
+## Residuos
+
+```{r}
+plot(residuals(t3))
+```
+
+- El R2 se define a manera análoga a regresión
+
+$$
+R^2 = 1 - \frac{RSS}{TSS}
+$$
+
+- donde hay que recordar de RSS = deviance(nodo) y TSS = deviance(root)
+
+- Se denomina error relativo al cociente RSS/TSS. Y la X indica que se ha calculado mediante validación cruzada.
+
+```{r}
+par(mfrow = c(1,2))
+rsq.rpart(t3)
+```
+
+- Appatent: R2 calculado con la formula (1 - RSS/TSS)
+- X Relative: R2 calculado con validación cruzada (como vemos, el R2 cuadrado con validación cruzada es menor que el apparent ya que uno esta calculado en los datos train y otro en los datos test).
+- X relative error: 1 - X Relative, es decir, RSS/TSS. Está calculado con validación cruzada. Se dibuja el intervalo +/- SE calculado con validación cruzada.
+
+## Dibujar el arbol
 
 # Podado
 
-```{r}
-t3_prune = prune.tree(t3, best = 8)
-plot(t3_prune)
-text(t3_prune, cex=.75)
-```
+- Los árboles que hemos visto se construyen de arriba hacia abajo, desde el nodo raiz hasta las hojas. Otra estrategia es construir un arbol muy profundo y luego podarlo. Construiriamos el arbol, por tanto, de abajo hacia arriba.
 
-
-# Training set *vs* Test set
-
-Dividimos los datos en dos partes, una para entrenar el modelo y otra para calcular el error de predicción con datos diferentes de los utilizados para entrenar:
+- Primero construimos un arbol profundo:
 
 ```{r}
-set.seed(321)
-ndat = nrow(datos)
-train = sample(1:ndat,ndat/2) # la mitad de los datos para entranamiento
-datos_train = datos[train,] # trainning set
-datos_test = datos[-train,] # test set
+t4 = rpart(consumo ~ ., data = d, method = "anova",
+    control = rpart.control(minsplit = 2, cp = 0.001))
 ```
 
-Entrenamiento del modelo
+- Utilizando validación cruzada (el numero de validaciones viene dado por el parámetro xval), se determina el arbol con un determinado numero de hojas que tenga el mayor R2, o de manera equivalente, el menor error relativo.  
 
 ```{r}
-t3 <- tree(consumo ~ ., data = datos_train)
-plot(t3)
-text(t3)
+t4_printcp = printcp(t4) # lo guardamos en una variable para utilizarlo despues
 ```
 
-## Error del modelo
+- Salida de printcp():
+    - col1: numero de nodos del arbol podado.
+    - col2: cp (el ultimo cp es el incluido al construir el modelo)
+    - col3: error relativo del arbol podado, RSS/TSS
+    - col4: error relativo calculado con validación cruzada.
+    - col5: desviación típica de xerror
+- También se puede utilizar plotcp():
 
 ```{r}
-y_train_p <- predict(t3, newdata = datos_train)
+plotcp(t4)
 ```
 
+- A veces este gráfico tiene un mínimo, por lo que deberíamos seleccionar ese arbol. En caso contrario, elegimos el tamaño donde el error se estabilice.
+
+- Según el gráfico y la tabla anterior, un arbol de 12 hojas parece razonable. 
 
 ```{r}
-y_train = datos_train$consumo
-plot(y_train,y_train_p)
-abline(0,1) # como pintamos y vs yp, la relacion perfecta deberia ser una recta a 45º (m=1)
+(t4_cp = t4_printcp[12,"CP"])
 ```
+
+- Ahora podamos el arbol:
 
 ```{r}
-( MSE_train = mean((y_train-y_train_p)^2) ) # error cuadratico medio en los datos de training
+t4_prune = prune(t4, cp = t4_cp)
+plot(t4_prune, margin = 0.02)
+text(t4_prune, cex=.75)
 ```
 
-## Error de predicción
+# Prediccion
 
 ```{r}
-# prediccion del consumo con los datos de test
-y_test_p = predict(t3, newdata = datos_test)
-
-# error del test set
-y_test = datos_test$consumo
-(MSE_test = mean((y_test-y_test_p)^2))
+xp = data.frame(cc = 4500, cv = 110, peso = 950, acel = 13, 
+                ano = 70, origen = "Europa", cilindros = 8)
+predict(t4_prune, newdata = xp)
 ```
 
-El error es mucho mayor con los datos de validación!
+- Mirando el arbol se puede verificar fácilmente la predicción.
+

@@ -14,9 +14,9 @@ output:
 
 ```{r cars}
 library(tree)
-datos = read.table('datos/coches.txt',header=T)
-datos = na.omit(datos)
-datos$origen = factor(datos$origen, labels = c("USA","Europa","Japon"))
+d = read.table('datos/coches.txt',header=T)
+d = na.omit(d)
+d$origen = factor(d$origen, labels = c("USA","Europa","Japon"))
 ```
 
 # Training set *vs* Test set
@@ -25,23 +25,22 @@ Dividimos los datos en dos partes, una para entrenar el modelo y otra para calcu
 
 ```{r}
 set.seed(321)
-ndat = nrow(datos)
-train = sample(1:ndat,ndat/2) # la mitad de los datos para entranamiento
-datos_train = datos[train,] # trainning set
-datos_test = datos[-train,] # test set
+ndat = nrow(d)
+pos_train = sample(1:ndat,ndat/2) # la mitad de los datos para entranamiento
+datos_train = d[pos_train,] # trainning set
+datos_test = d[-pos_train,] # test set
 ```
 
 # Boosting
 
-
 - Se puede utilizar para otros modelos además de los árboles.
-- El modelo verifica que: $y_i = \hat f(x) + r_i$.
-- Tomar $\hat f(x)=0$ y $r_i = y_i$.
+- El modelo verifica que: $y = \hat f(x) + r$.
+- Empezar el algoritmo tomando $\hat f_0(x)=0$ y $r_0 = y$.
 - For b = 1, ..., B
-    - Estimar un arbol $\hat f_b(x)$ con (d+1) nodos (d splits).
-    - Actualizar el modelo: $\hat f(x) = \hat f(x) + \lambda \hat f_b(x)$
-    - Actualizar los residuos: $r_i = r_i - \lambda \hat f_b(x)$
-- El resultado es el modelo boosted:
+    - Estimar el modelo correspondiente $r_{b-1} = \hat f_b(x) + r_b$ (arbol de regresión en este caso).
+    - Actualizar el modelo: $\hat f_{b}(x) = \hat f_{b-1}(x) + \lambda \hat f_b(x)$
+    - Actualizar los residuos: $r_b = r_{b-1} - \lambda \hat f_b(x)$
+- El resultado es el modelo boosted será, por tanto:
 
 $$
 \hat f(x) = \sum _{b=1}^{B} \lambda \hat f_b(x), \quad r_i \rightarrow 0
@@ -51,7 +50,8 @@ $$
 ```{r}
 library(gbm)
 set.seed(321)
-boost1 = gbm(consumo ~ ., data = datos_train, distribution = "gaussian", n.trees = 5000, interaction.depth = 4)
+boost1 = gbm(consumo ~ ., data = datos_train, distribution = "gaussian", 
+             n.trees = 5000, interaction.depth = 4)
 ```
 
 - interaction.depth = 4: Como mucho, cada árbol tendrá cuadro niveles (5 nodos terminales).
@@ -83,7 +83,8 @@ Que es superior al obtenido con bagging y random forest.
 Se puede modificar el parámetro $\lambda$, que por defecto es 0.001
 
 ```{r}
-boost2 = gbm(consumo ~ ., data = datos_train, distribution = "gaussian", n.trees = 5000, interaction.depth = 4, shrinkage = 0.2)
+boost2 = gbm(consumo ~ ., data = datos_train, distribution = "gaussian", 
+             n.trees = 5000, interaction.depth = 4, shrinkage = 0.2)
 ```
 
 ```{r}
