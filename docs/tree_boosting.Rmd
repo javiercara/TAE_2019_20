@@ -39,11 +39,11 @@ datos_test = d[-pos_train,] # test set
 - For b = 1, ..., B
     - Estimar el modelo correspondiente $r_{b-1} = \hat f_b(x) + r_b$ (arbol de regresión en este caso).
     - Actualizar el modelo: $\hat f_{b}(x) = \hat f_{b-1}(x) + \lambda \hat f_b(x)$
-    - Actualizar los residuos: $r_b = r_{b-1} - \lambda \hat f_b(x)$
+    - Actualizar los residuos: $r_b = r_{b-1} - \lambda r_b(x)$
 - El resultado es el modelo boosted será, por tanto:
 
 $$
-\hat f(x) = \sum _{b=1}^{B} \lambda \hat f_b(x), \quad r_i \rightarrow 0
+\hat f(x) = \sum _{b=1}^{B} \lambda \hat f_b(x), \quad r_b \rightarrow 0
 $$
 - El parámetro $\lambda$ controla la velociad del proceso.
 

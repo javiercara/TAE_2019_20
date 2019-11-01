@@ -51,8 +51,9 @@ output:
     a. Introducción
     b. [Estimación](tree_regresion.html)
     c. [Random Forest](tree_RandomForest.html)
-    d. [boosting](tree_boosting.html)
+    d. [Boosting](tree_boosting.html) (No entra en el examen)
 2. Árboles de clasificación
+    a. [Árboles de clasificación](tree_clasificacion.html)
 
 
 # Bibliografía
